@@ -175,10 +175,41 @@
             return Math.max(0, Math.round((t - s) / (1000 * 60 * 60 * 24 * 7)));
         };
 
+        // --- 成績紀錄解析輔助函數 (相容舊版純數字格式) ---
+        const getTestRecord = (record, mode) => {
+            if (!record || record[mode] === undefined) return null;
+            // 舊版成績是純數字 (例如得 150 分代表 15題全對過關)
+            if (typeof record[mode] === 'number') {
+                return { correct: record[mode] / 10, total: record[mode] / 10 }; 
+            }
+            return record[mode];
+        };
+
+        // 計算 100分制 每日總分
+        const getDayTotalScore = (record) => {
+            if (!record) return 0;
+            let totalCorrect = 0;
+            let totalQuestions = 0;
+            let completedCount = 0;
+            
+            ['listening', 'listening-en', 'dictation', 'speaking'].forEach(mode => {
+                const res = getTestRecord(record, mode);
+                if (res) {
+                    totalCorrect += res.correct;
+                    totalQuestions += res.total;
+                    completedCount++;
+                }
+            });
+            
+            if (totalQuestions === 0) return 0;
+            // 按權重計分：答對率 * (已完成的測驗項目數 * 25分)，四項全破滿分為 100分
+            return Math.round((totalCorrect / totalQuestions) * (completedCount * 25));
+        };
+
         // --- 主程式開始 ---
         function App() {
             const [appState, setAppState] = useState('setup');
-            const [vocabLevel, setVocabLevel] = useState('elementary'); // 預設國小版
+            const [vocabLevel, setVocabLevel] = useState('elementary');
             const [startDate, setStartDate] = useState(formatDate(new Date())); 
             
             const [globalVocab, setGlobalVocab] = useState([]); 
@@ -189,7 +220,12 @@
             
             const [currentWords, setCurrentWords] = useState([]); 
             const [currentIndex, setCurrentIndex] = useState(0);
-            const [score, setScore] = useState(0);
+            
+            // 全新計分系統狀態
+            const [initialWordCount, setInitialWordCount] = useState(0);
+            const [firstPassCorrectCount, setFirstPassCorrectCount] = useState(0);
+            const [isFirstPass, setIsFirstPass] = useState(true);
+
             const [feedback, setFeedback] = useState(null); 
             const [notification, setNotification] = useState('');
             const [wrongWords, setWrongWords] = useState([]);
@@ -221,7 +257,6 @@
                 const savedLevel = localStorage.getItem('wordMasterVocabLevel') || 'elementary';
                 setVocabLevel(savedLevel);
                 
-                // 獨立後綴碼區分國小與國中儲存區
                 const suffix = savedLevel === 'junior' ? '_junior' : '';
                 const savedStart = localStorage.getItem('wordMasterStartDate' + suffix);
                 const savedRecords = localStorage.getItem('wordMasterDailyRecords' + suffix);
@@ -253,7 +288,6 @@
                 }
             }, []);
 
-            // 在設定頁面切換版本時，嘗試載入該版本的專屬日期
             const handleLevelChange = (newLevel) => {
                 setVocabLevel(newLevel);
                 const suffix = newLevel === 'junior' ? '_junior' : '';
@@ -339,7 +373,12 @@
                 }
                 setCurrentWords(testWords);
                 setCurrentIndex(0);
-                setScore(0);
+                
+                // 重置計分機制 (只計算首輪答對)
+                setInitialWordCount(testWords.length);
+                setFirstPassCorrectCount(0);
+                setIsFirstPass(true);
+
                 setFeedback(null);
                 setWrongWords([]);
                 setSpeechError(false); 
@@ -378,8 +417,21 @@
                 let updatedWrongWords = [...wrongWords];
                 setSpeechError(false); 
 
+                // --- 口說糾音：若答錯且為口說模式，播報正確發音 ---
+                if (!isCorrect && currentTestMode === 'speaking') {
+                    setTimeout(() => {
+                        speakWord(currentWords[currentIndex].en);
+                    }, 600); // 延遲 600ms 讓錯誤提示音效先播完
+                }
+
+                // --- 首答計分機制：只有在第一次看到題目(isFirstPass)並答對時，才算得分 ---
+                let newCorrectCount = firstPassCorrectCount;
+                if (isCorrect && isFirstPass) {
+                    newCorrectCount += 1;
+                    setFirstPassCorrectCount(newCorrectCount);
+                }
+
                 if (isCorrect) {
-                    setScore(prev => prev + 10);
                     setFeedback('correct');
                     AudioEngine.play('correct'); 
                 } else {
@@ -404,19 +456,29 @@
                             setCurrentWords(shuffleArray(updatedWrongWords)); 
                             setCurrentIndex(0);
                             setWrongWords([]);
+                            setIsFirstPass(false); // 進入錯題重作模式，不再加分
                             setFeedback(null);
                             setUserInput('');
                         } else {
                             AudioEngine.play('clear'); 
-                            const finalScore = isCorrect ? score + 10 : score;
-                            setScore(finalScore); 
 
+                            // 紀錄儲存：儲存本次答對題數，用於計算百分配分
                             if (activeDateInfo && currentTestMode) {
                                 const dateStr = activeDateInfo.date;
                                 setDailyRecords(prev => {
                                     const newRecords = { ...prev };
                                     if (!newRecords[dateStr]) newRecords[dateStr] = {};
-                                    newRecords[dateStr][currentTestMode] = Math.max(newRecords[dateStr][currentTestMode] || 0, finalScore);
+                                    
+                                    const prevRecord = getTestRecord(newRecords[dateStr], currentTestMode);
+                                    const prevCorrect = prevRecord ? prevRecord.correct : -1;
+                                    
+                                    // 若本次「一次答對」的題數超過以往，則更新最高紀錄
+                                    if (newCorrectCount >= prevCorrect) {
+                                        newRecords[dateStr][currentTestMode] = {
+                                            correct: newCorrectCount,
+                                            total: initialWordCount
+                                        };
+                                    }
                                     
                                     const suffix = vocabLevel === 'junior' ? '_junior' : '';
                                     localStorage.setItem('wordMasterDailyRecords' + suffix, JSON.stringify(newRecords));
@@ -623,7 +685,7 @@
                     </div>
                     <div className="flex items-center space-x-2 bg-yellow-400 px-4 py-2 rounded-full text-yellow-900 font-black shadow-md">
                         <Trophy className="w-5 h-5" />
-                        <span>{score} 分</span>
+                        <span>答對 {firstPassCorrectCount} 題</span>
                     </div>
                 </div>
             );
@@ -741,8 +803,8 @@
                                 const isFuture = dObj > todayObj;
                                 
                                 const record = dailyRecords[dateStr] || {};
-                                const isFullyCompleted = record['listening'] !== undefined && record['listening-en'] !== undefined && record['dictation'] !== undefined && record['speaking'] !== undefined;
-                                const totalDayScore = (record['listening'] || 0) + (record['listening-en'] || 0) + (record['dictation'] || 0) + (record['speaking'] || 0);
+                                const isFullyCompleted = ['listening', 'listening-en', 'dictation', 'speaking'].every(mode => getTestRecord(record, mode) !== null);
+                                const totalDayScore = getDayTotalScore(record);
 
                                 let cardClass = "";
                                 if (isFullyCompleted) {
@@ -768,7 +830,7 @@
                                             <>
                                                 <CalendarCheck className="w-10 h-10 text-green-500 my-1 pointer-events-none" />
                                                 <span className="text-green-600 font-bold bg-green-100 px-3 py-1 rounded-full text-sm pointer-events-none">已完成打卡</span>
-                                                <span className="text-xs font-bold text-gray-500 mt-1 pointer-events-none">總分 {totalDayScore}</span>
+                                                <span className="text-xs font-bold text-gray-500 mt-1 pointer-events-none">總分 {totalDayScore} / 100</span>
                                             </>
                                         ) : isToday ? (
                                             <>
@@ -836,12 +898,13 @@
 
             const renderMenu = () => {
                 const todayRecord = activeDateInfo ? (dailyRecords[activeDateInfo.date] || {}) : {};
-                const isAllDone = todayRecord['listening'] !== undefined && todayRecord['listening-en'] !== undefined && todayRecord['dictation'] !== undefined && todayRecord['speaking'] !== undefined;
-                const totalScore = (todayRecord['listening'] || 0) + (todayRecord['listening-en'] || 0) + (todayRecord['dictation'] || 0) + (todayRecord['speaking'] || 0);
+                const isAllDone = ['listening', 'listening-en', 'dictation', 'speaking'].every(mode => getTestRecord(todayRecord, mode) !== null);
+                const totalDayScore = getDayTotalScore(todayRecord);
 
                 const renderMenuButton = (modeKey, icon, title, desc, borderClass, bgClass, hoverClass) => {
-                    const isDone = todayRecord[modeKey] !== undefined;
-                    const modeScore = todayRecord[modeKey] || 0;
+                    const testRec = getTestRecord(todayRecord, modeKey);
+                    const isDone = testRec !== null;
+                    const modeScore = isDone ? Math.round((testRec.correct / testRec.total) * 25) : 0;
                     return (
                         <button onClick={() => startGame(modeKey)} className={`group relative bg-white rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all transform hover:-translate-y-2 border-b-8 ${borderClass} ${isDone ? 'opacity-90' : ''}`}>
                             <div className={`absolute top-4 right-4 ${bgClass} rounded-full p-3 group-hover:${hoverClass} transition-colors`}>
@@ -850,8 +913,8 @@
                             <h2 className="text-2xl font-bold text-gray-800 mb-2 mt-4 text-left">{title}</h2>
                             <p className="text-gray-500 text-left mb-4">{desc}</p>
                             {isDone && (
-                                <div className="inline-block bg-green-100 text-green-700 font-bold px-4 py-1 rounded-full text-sm border border-green-200">
-                                   ✅ 已完成 (最高 {modeScore} 分)
+                                <div className="inline-block bg-green-100 text-green-700 font-bold px-4 py-1 rounded-full text-sm border border-green-200 mt-2">
+                                   ✅ 已完成 (首答對 {testRec.correct}/{testRec.total} 題，得 {modeScore} 分)
                                 </div>
                             )}
                         </button>
@@ -872,7 +935,7 @@
                         {isAllDone && (
                             <div className="w-full max-w-4xl bg-yellow-400 rounded-3xl p-6 text-center shadow-xl mb-4 text-yellow-900 border-4 border-yellow-300 animate-bounce">
                                <h3 className="text-2xl font-black mb-1">🎉 太棒了！已完成今日 4 項任務！ 🎉</h3>
-                               <p className="text-xl font-bold">今日總得分：{totalScore} 分</p>
+                               <p className="text-xl font-bold">今日總得分：{totalDayScore} 分 / 100 分</p>
                             </div>
                         )}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-4xl px-4">
@@ -964,7 +1027,10 @@
 
             const renderResult = () => {
                 const record = dailyRecords[activeDateInfo?.date] || {};
-                const isAllDone = record['listening'] !== undefined && record['listening-en'] !== undefined && record['dictation'] !== undefined && record['speaking'] !== undefined;
+                const isAllDone = ['listening', 'listening-en', 'dictation', 'speaking'].every(mode => getTestRecord(record, mode) !== null);
+                
+                // 計算單項轉換分數 (滿分 25 分)
+                const testScore = Math.round((firstPassCorrectCount / initialWordCount) * 25);
 
                 return (
                     <div className="flex flex-col items-center w-full max-w-lg bg-white rounded-3xl shadow-2xl p-10 text-center relative overflow-hidden">
@@ -979,7 +1045,8 @@
                             <Trophy className="w-32 h-32 text-yellow-400 mx-auto filter drop-shadow-lg" />
                         </div>
                         <h2 className="text-5xl font-black text-gray-800 mb-2 z-10">測驗完成！</h2>
-                        <p className="text-3xl text-blue-600 font-bold mb-8 z-10">本次測驗獲得了 <span className="text-yellow-500">{score}</span> 分！</p>
+                        <p className="text-2xl text-blue-600 font-bold mb-2 z-10">第一次答對題數：<span className="text-yellow-500 text-3xl">{firstPassCorrectCount} / {initialWordCount}</span> 題</p>
+                        <p className="text-lg text-gray-500 font-bold mb-8 z-10 bg-gray-100 px-4 py-1 rounded-full inline-block">轉換單項積分：{testScore} / 25 分</p>
                         
                         <div className="flex flex-col space-y-4 w-full z-10">
                             <button onClick={() => setAppState('menu')} className="flex items-center justify-center bg-blue-500 hover:bg-blue-600 text-white font-bold py-4 px-8 rounded-2xl text-xl transition-all shadow-md w-full transform hover:scale-105">
