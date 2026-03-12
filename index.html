@@ -48,7 +48,7 @@
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
 
-        // --- 全域音效引擎：超大聲驚喜升級版 ---
+        // --- 全域音效引擎 ---
         const AudioEngine = (function() {
             let ctx = null;
             let unlocked = false;
@@ -129,7 +129,7 @@
             };
         })();
 
-        // --- 字串模糊比對演算法 (Levenshtein Distance) ---
+        // --- 字串模糊比對演算法 (專供口說容錯使用) ---
         const getLevenshteinDistance = (a, b) => {
             const matrix = [];
             for (let i = 0; i <= b.length; i++) { matrix[i] = [i]; }
@@ -150,14 +150,19 @@
             const cleanSpoken = spoken.toLowerCase().replace(/[^a-z ]/g, '');
             const cleanTarget = target.toLowerCase().replace(/[^a-z ]/g, '');
             
+            // 完全包含 (例如辨識出 "a apple"，目標是 "apple")
             if (cleanSpoken.includes(cleanTarget)) return true;
 
             const words = cleanSpoken.split(/\s+/);
             for (let w of words) {
                 if (w === cleanTarget) return true;
+                
                 const dist = getLevenshteinDistance(w, cleanTarget);
-                // 允許容錯：長度小於等於4容許1個錯誤，大於4容許2個錯誤
-                const threshold = cleanTarget.length <= 4 ? 1 : 2;
+                // 動態容錯門檻：單字越長，允許辨識錯誤的字母數越多 (相近音容錯)
+                let threshold = 1; 
+                if (cleanTarget.length >= 7) threshold = 3;
+                else if (cleanTarget.length >= 4) threshold = 2;
+
                 if (dist <= threshold) return true;
             }
             return false;
@@ -217,7 +222,6 @@
             return record[mode];
         };
 
-        // 四項必要測驗模式
         const REQUIRED_MODES = ['listening', 'dictation', 'speaking', 'dictation-en'];
 
         const getDayTotalScore = (record) => {
@@ -406,10 +410,8 @@
                 let testWords = [];
                 
                 if (mode === 'comprehensive') {
-                    // 綜合練習模式：從當日錯題池抓取
                     testWords = shuffleArray(dailyRecords[activeDateInfo.date].wrongWords || []);
                 } else {
-                    // 一般測驗模式
                     testWords = [...activeWordsPool];
                     if (activeDateInfo && !activeDateInfo.isWeekend) {
                         testWords = shuffleArray(testWords).slice(0, 15);
@@ -436,7 +438,7 @@
             const speakWord = (word) => {
                 if ('speechSynthesis' in window) {
                     const utterance = new SpeechSynthesisUtterance(word);
-                    utterance.lang = 'en-US'; // 預設美式發音輸出
+                    utterance.lang = 'en-US';
                     utterance.rate = 0.8; 
                     window.speechSynthesis.speak(utterance);
                 } else {
@@ -452,7 +454,6 @@
                     setOptions(currentOptions);
                     speakWord(correctWord.en);
                 } else if ((appState === 'dictation-en' || appState === 'speaking' || appState === 'dictation') && currentWords.length > 0 && !feedback) {
-                    // 若為聽音默寫，進場自動播放發音
                     if (appState === 'dictation-en') {
                         speakWord(currentWords[currentIndex].en);
                     }
@@ -473,7 +474,6 @@
                     setFirstPassCorrectCount(newCorrectCount);
                 }
 
-                // --- 將錯題紀錄寫入每日資料庫 (供綜合練習使用) ---
                 if (!isCorrect && isFirstPass) {
                     if (activeDateInfo && currentTestMode !== 'comprehensive') {
                         const dateStr = activeDateInfo.date;
@@ -483,7 +483,6 @@
                             if (!newRecords[dateStr].wrongWords) newRecords[dateStr].wrongWords = [];
                             
                             const currentWordEn = currentWords[currentIndex].en;
-                            // 防止重複加入相同錯題
                             if (!newRecords[dateStr].wrongWords.some(w => w.en === currentWordEn)) {
                                 newRecords[dateStr].wrongWords.push(currentWords[currentIndex]);
                             }
@@ -532,7 +531,6 @@
                                     if (!newRecords[dateStr]) newRecords[dateStr] = {};
                                     
                                     if (currentTestMode === 'comprehensive') {
-                                        // 標記綜合測驗已完成
                                         newRecords[dateStr].comprehensiveDone = true;
                                     } else if (currentTestMode) {
                                         const prevRecord = getTestRecord(newRecords[dateStr], currentTestMode);
@@ -563,13 +561,17 @@
                 handleAnswer(selectedWord.en === currentWords[currentIndex].en);
             };
 
+            // ★ 打字測驗：絕對精準比對 (無容錯)
             const handleDictationSubmit = (e) => {
                 e.preventDefault();
                 if (feedback || !userInput.trim()) return;
-                handleAnswer(currentWords[currentIndex].en.toLowerCase() === userInput.trim().toLowerCase());
+                
+                // 100% 精準比對 (僅忽略大小寫與前後空白)
+                const isCorrect = currentWords[currentIndex].en.toLowerCase() === userInput.trim().toLowerCase();
+                handleAnswer(isCorrect);
             };
 
-            // --- 進階容錯口說驗證處理 ---
+            // ★ 口說測驗：包含強大容錯處理
             const handleSpeak = () => {
                 if (isRecording) {
                     if (recognitionRef.current) recognitionRef.current.stop();
@@ -583,7 +585,6 @@
                     setSpeechError(true);
                     return;
                 }
-                const isIframe = window.self !== window.top;
                 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
                 if (!SpeechRecognition) {
                     setNotification('❌ 瀏覽器不支援：建議使用 Chrome、Edge 或 Safari。');
@@ -593,9 +594,9 @@
                 
                 const recognition = new SpeechRecognition();
                 recognitionRef.current = recognition;
-                recognition.lang = 'en-US'; // 預設使用美式發音模型，但文字容錯涵蓋英式差異
+                recognition.lang = 'en-US'; 
                 recognition.interimResults = false;
-                recognition.maxAlternatives = 5; // ★ 取出前5名可能的辨識結果以提高準確度
+                recognition.maxAlternatives = 5; // 取前 5 名可能辨識結果做交叉比對
 
                 let hasHandledResult = false; 
 
@@ -625,10 +626,10 @@
                     let bestTranscript = "";
                     const correctAns = currentWords[currentIndex].en.toLowerCase();
 
-                    // 掃描所有可能的辨識結果 (容錯處理)
+                    // 掃描所有可能的辨識結果 (只要有一個中/相近，就算對！)
                     for (let i = 0; i < event.results[0].length; i++) {
                         const transcript = event.results[0][i].transcript;
-                        if (i === 0) bestTranscript = transcript; // 保留第一順位做提示
+                        if (i === 0) bestTranscript = transcript; 
                         
                         if (isFuzzyMatch(transcript, correctAns)) {
                             matched = true;
@@ -919,9 +920,7 @@
                                 const isFuture = dObj > todayObj;
                                 
                                 const record = dailyRecords[dateStr] || {};
-                                // 四關卡全部完成
                                 const isTestsDone = REQUIRED_MODES.every(mode => getTestRecord(record, mode) !== null);
-                                // 無錯題，或者綜合錯題練習已做完
                                 const isComprehensiveDone = !record.wrongWords || record.wrongWords.length === 0 || record.comprehensiveDone;
                                 const isFullyCompleted = isTestsDone && isComprehensiveDone;
 
@@ -1110,7 +1109,7 @@
                     {renderFeedback()}
                     <div className="mb-4 text-pink-500 font-bold text-lg bg-pink-50 px-4 py-1 rounded-full">第 {currentIndex + 1} / {currentWords.length} 題</div>
                     <div className="text-center mb-8 mt-4">
-                        <p className="text-gray-500 font-medium mb-2">請拼出正確的英文單字</p>
+                        <p className="text-gray-500 font-medium mb-2">請拼出正確的英文單字 <span className="text-pink-500">(需拼寫完全正確)</span></p>
                         <h3 className="text-5xl font-black text-gray-800 tracking-wide">{currentWords[currentIndex]?.zh}</h3>
                     </div>
                     <form onSubmit={handleDictationSubmit} className="w-full max-w-md flex flex-col space-y-4">
@@ -1130,7 +1129,7 @@
                         <Headphones className="w-16 h-16 text-orange-600" />
                     </button>
                     <div className="text-center mb-8">
-                        <p className="text-gray-500 font-medium mb-2">請聽發音，默寫出正確的英文單字</p>
+                        <p className="text-gray-500 font-medium mb-2">請聽發音，默寫出正確的英文單字 <span className="text-orange-500">(需拼寫完全正確)</span></p>
                     </div>
                     <form onSubmit={handleDictationSubmit} className="w-full max-w-md flex flex-col space-y-4">
                         <input type="text" value={userInput} onChange={(e) => setUserInput(e.target.value)} disabled={feedback !== null} placeholder="輸入英文..." className="w-full px-6 py-4 text-3xl text-center font-bold text-gray-700 bg-gray-50 border-4 border-orange-200 rounded-2xl focus:outline-none focus:border-orange-500 transition-colors shadow-inner" autoFocus />
@@ -1155,9 +1154,8 @@
                         <Mic className="w-20 h-20 text-white" />
                         {isRecording && <span className="absolute -bottom-8 text-red-500 font-bold whitespace-nowrap">點擊麥克風結束</span>}
                     </button>
-                    {!isRecording && !feedback && <p className="mt-8 text-gray-400 font-medium">點擊麥克風，念出上方的英文單字</p>}
+                    {!isRecording && !feedback && <p className="mt-8 text-green-600 font-bold">點擊麥克風，念出上方的英文單字 <span className="text-gray-400 font-medium">(支援口音容錯)</span></p>}
 
-                    {/* 已移除略過按鈕，僅保留裝置無法錄音時的警示訊息 */}
                     {speechError && !feedback && (
                         <div className="mt-6 text-red-500 font-bold px-6 py-3 bg-red-50 rounded-full shadow-md animate-pop">
                             ⚠️ 發生錯誤：請確認麥克風已授權或網路正常，才能繼續破關喔！
@@ -1248,7 +1246,6 @@
                         {appState === 'review' && renderReview()}
                         {appState === 'menu' && renderMenu()}
                         
-                        {/* 由於綜合練習是基於聽力介面延伸的，因此共用 renderListeningMode */}
                         {(appState === 'listening' || appState === 'comprehensive') && renderListeningMode()}
                         
                         {appState === 'dictation-en' && renderDictationEnMode()}
