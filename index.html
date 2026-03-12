@@ -134,13 +134,12 @@
         const CalendarX = ({className}) => <Icon className={className} d={<><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="10" y1="14" x2="14" y2="18"/><line x1="14" y1="14" x2="10" y2="18"/></>} />;
         const BookOpen = ({className}) => <Icon className={className} d={<><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></>} />;
 
-        // --- 內建：教育部國中小基本英語字彙 ---
-        const RAW_VOCAB_STRING = "a:一個,able:能夠的,about:關於,above:在上方,abroad:在國外,across:越過,act:行動,action:動作,actor:男演員,actress:女演員,adult:成人,afraid:害怕的,after:在之後,afternoon:下午,again:再一次,age:年齡,ago:以前,agree:同意,ahead:在前方,air:空氣,airplane:飛機,airport:機場,all:全部,almost:幾乎,along:沿著,already:已經,also:也,always:總是,am:是,America:美國,American:美國人,and:和,angel:天使,angry:生氣的,animal:動物,another:另一個,answer:回答,ant:螞蟻,any:任何的,anyone:任何人,anything:任何事物,apartment:公寓,appear:出現,apple:蘋果,April:四月,are:是,arm:手臂,around:在周圍,arrive:到達,art:藝術,as:如同,ask:詢問,at:在,August:八月,aunt:阿姨,autumn:秋天,away:離開,baby:嬰兒,back:後面,bad:壞的,badminton:羽毛球,bag:袋子,bake:烘烤,bakery:麵包店,ball:球,balloon:氣球,banana:香蕉,band:樂團,bank:銀行,barbecue:烤肉,base:基礎,baseball:棒球,basket:籃子,basketball:籃球,bat:蝙蝠,bath:洗澡,bathroom:浴室,be:是,beach:海灘,bear:熊,beautiful:美麗的,because:因為,become:成為,bed:床,bedroom:臥室,bee:蜜蜂,beef:牛肉,before:在之前,begin:開始,behind:在後面,believe:相信,bell:鈴,belong:屬於,below:在下方,belt:皮帶,bench:長椅,beside:在旁邊,between:在之間,bicycle:腳踏車,big:大的,bird:鳥,bite:咬,black:黑色的,block:街區,blood:血液,blow:吹,blue:藍色的,boat:小船,body:身體,bone:骨頭,book:書本,bookstore:書店,boring:無聊的,born:出生,borrow:借入,boss:老闆,both:兩者,bottle:瓶子,bottom:底部,bowl:碗,box:箱子,boy:男孩,bread:麵包,break:打破,breakfast:早餐,bridge:橋,bright:明亮的,bring:帶來,brother:兄弟,brown:棕色的,brush:刷子,bug:蟲,build:建造,burn:燃燒,bus:公車,business:商業,businessman:商人,busy:忙碌的,but:但是,butter:奶油,butterfly:蝴蝶,buy:買,by:藉由,cabbage:高麗菜,cake:蛋糕,call:呼叫,camel:駱駝,camera:照相機,camp:露營,can:可以,candy:糖果,cap:帽子,car:汽車,card:卡片,care:關心,careful:小心的,carry:攜帶,case:案例,cat:貓,catch:捕捉,celebrate:慶祝,cellphone:手機,cent:分,center:中心,chair:椅子,chance:機會,change:改變,cheap:便宜的,cheat:作弊,check:檢查,cheer:歡呼,cheese:起司,chicken:雞,child:小孩,chocolate:巧克力,choose:選擇,chopsticks:筷子,church:教堂,circle:圓圈,city:城市,class:班級,classmate:同學,classroom:教室,clean:乾淨的,clear:清楚的,clerk:店員,climb:攀爬,clock:時鐘,close:關閉,cloud:雲,cloudy:多雲的,club:俱রাপ部,coat:外套,coffee:咖啡,cola:可樂,cold:冷的,color:顏色,come:來,comfortable:舒適的,common:常見的,computer:電腦,convenient:方便的,cook:烹調,cookie:餅乾,cool:涼爽的,copy:複製,corner:角落,correct:正確的,cost:花費,cotton:棉花,couch:沙發,count:計算,country:國家,course:課程,cousin:表親,cover:覆蓋,cow:母牛,crazy:瘋狂的,cross:跨越,cry:哭泣,cup:杯子,cut:切割,cute:可愛的,dance:跳舞,dangerous:危險的,dark:黑暗的,date:日期,daughter:女兒,day:白天,dead:死亡的,deal:交易,dear:親愛的,December:十二月,decide:決定,delicious:美味的,dentist:牙醫,department:部門,desk:書桌,dictionary:字典,die:死亡,different:不同的,difficult:困難的,dig:挖掘,dining:用餐,dinner:晚餐,dirty:髒的,discover:發現,dish:菜餚,do:做,doctor:醫生,dog:狗,doll:洋娃娃,dollar:元,door:門,dot:點,down:向下,draw:畫,dream:夢想,dress:洋裝,drink:喝,drive:駕駛,driver:司機,drop:掉落,dry:乾燥的,duck:鴨子,dumpling:水餃,during:在期間,each:每一個,ear:耳朵,early:早的,earth:地球,east:東方,easy:容易的,eat:吃,egg:蛋,eight:八,eighteen:十八,eighty:八十,either:也(用於否定),elementary:基本的,elephant:大象,eleven:十一,else:其他,end:結束,English:英語,enjoy:享受,enough:足夠的,enter:進入,envelope:信封,eraser:橡皮擦,eve:前夕,even:甚至,evening:傍晚,ever:曾經,every:每一個,everyone:每個人,everything:每件事物,example:例子,excellent:優秀的,except:除了,excuse:藉口,exercise:運動,expensive:昂貴的,experience:經驗,eye:眼睛,face:臉,fact:事實,factory:工廠,fail:失敗,fall:秋天,family:家庭,famous:著名的,fan:粉絲,far:遠的,farm:農場,farmer:農夫,fast:快速的,fat:胖的,father:父親,favorite:最喜愛的,February:二月,feel:感覺,festival:節慶,few:很少,fifteen:十五,fifty:五十,fight:打架,fill:充滿,find:找到,fine:好的,finger:手指,finish:完成,fire:火,first:第一,fish:魚,five:五,fix:修理,floor:地板,flower:花,fly:飛,follow:跟隨,food:食物,foot:腳,for:為了,foreign:外國的,foreigner:外國人,forget:忘記,fork:叉子,forty:四十,four:四,fourteen:十四,fox:狐狸,free:自由的,fresh:新鮮的,Friday:星期五,friend:朋友,friendly:友善的,frog:青蛙,from:來自,front:前面,fruit:水果,full:滿的,fun:樂趣,funny:有趣的,future:未來,game:遊戲,garbage:垃圾,garden:花園,gas:瓦斯,get:得到,ghost:鬼,giant:巨人,gift:禮物,girl:女孩,give:給予,glad:高興的,glass:玻璃,glove:手套,go:去,goat:山羊,good:好的,goose:鵝,grade:成績,gram:克,grandfather:祖父,grandmother:祖母,grass:草,gray:灰色的,great:棒的,green:綠色的,ground:地面,group:群體,grow:成長,guess:猜測,guest:客人,guide:引導,guitar:吉他,guy:傢伙,habit:習慣,hair:頭髮,half:一半,hamburger:漢堡,hand:手,handsome:英俊的,happen:發生,happy:快樂的,hard:困難的,hat:帽子,hate:討厭,have:有,he:他,head:頭,headache:頭痛,health:健康,healthy:健康的,hear:聽見,heart:心,heat:熱,heavy:重的,hello:哈囉,help:幫助,helpful:有幫助的,here:這裡,hero:英雄,hide:隱藏,high:高的,hill:山丘,history:歷史,hit:打擊,hobby:嗜好,hold:握住,holiday:假日,home:家,homework:作業,honest:誠實的,hope:希望,horse:馬,hospital:醫院,host:主持人,hot:熱的,hotel:旅館,hour:小時,house:房子,how:如何,hundred:百,hungry:飢餓的,hunt:狩獵,hurry:匆忙,hurt:受傷,husband:丈夫,ice:冰,idea:點子,if:如果,important:重要的,in:在裡面,inside:在內部,interest:興趣,interested:感興趣的,Internet:網路,into:進入,island:島嶼,it:它,jacket:夾克,January:一月,jeans:牛仔褲,job:工作,jog:慢跑,join:加入,joy:喜悅,juice:果汁,July:七月,jump:跳躍,June:六月,junior:較年少的,just:只是,keep:保持,key:鑰匙,kick:踢,kid:小孩,kill:殺死,kilogram:公斤,kind:種類,king:國王,kiss:親吻,kitchen:廚房,kite:風箏,knee:膝蓋,knife:刀子,know:知道,knowledge:知識,lake:湖泊,lamp:燈,land:土地,language:語言,lantern:燈籠,large:巨大的,last:最後的,late:遲的,laugh:大笑,lawyer:律師,lazy:懶惰的,lead:領導,leader:領袖,leaf:葉子,learn:學習,least:最少,leave:離開,left:左邊,leg:腿,lemon:檸檬,lend:借出,less:較少,lesson:課程,let:讓,letter:信件,library:圖書館,lie:躺,life:生活,light:光線,like:喜歡,line:線,lion:獅子,lip:嘴唇,list:清單,listen:聽,little:小的,live:居住,living:活著的,lonely:寂寞的,long:長的,look:看,lose:失去,loud:大聲的,love:愛,low:低的,lucky:幸運的,machine:機器,mad:生氣的,magic:魔術,mail:郵件,mailman:郵差,make:製造,man:男人,many:許多,map:地圖,March:三月,mark:標記,market:市場,married:已婚的,master:大師,matter:事情,May:五月,maybe:也許,meal:餐點,mean:意指,meat:肉,medicine:藥,medium:中等的,meet:遇見,meeting:會議,menu:菜單,mile:英里,milk:牛奶,million:百萬,mind:介意,minute:分鐘,miss:想念,mistake:錯誤,moment:時刻,Monday:星期一,money:錢,monkey:猴子,month:月份,moon:月亮,more:更多,morning:早晨,most:最多,mother:母親,motorcycle:機車,mountain:山,mouse:老鼠,mouth:嘴巴,move:移動,movie:電影,much:許多,museum:博物館,music:音樂,must:必須,name:名字,national:國家的,nature:自然,near:在附近,neck:脖子,need:需要,neighbor:鄰居,never:從不,new:新的,news:新聞,next:下一個,nice:美好的,night:夜晚,nine:九,nineteen:十九,ninety:九十,no:不,nobody:沒有人,nod:點頭,noise:噪音,noodle:麵條,noon:中午,north:北方,nose:鼻子,not:不,note:筆記,nothing:沒有事物,notice:注意,November:十一月,now:現在,number:數字,nurse:護士,ocean:海洋,o'clock:點鐘,October:十月,of:的,off:離開,office:辦公室,officer:軍官,often:經常,oil:油,OK:好的,old:老的,on:在上面,once:一次,one:一,only:只有,open:打開,orange:橘子,order:點餐,other:其他的,out:外面,outside:在外部,over:超過,own:自己的,pack:打包,package:包裹,page:頁面,paint:畫畫,pair:一雙,pants:長褲,papaya:木瓜,paper:紙張,parent:父母,park:公園,part:部分,party:派對,pass:通過,past:過去,pay:支付,PE:體育,pen:筆,pencil:鉛筆,people:人們,perhaps:或許,person:人,pet:寵物,piano:鋼琴,pick:挑選,picnic:野餐,picture:圖片,pie:派,piece:碎片,pig:豬,pin:大頭針,pink:粉紅色,pipe:管子,pizza:披薩,place:地方,plan:計畫,planet:行星,plant:植物,play:玩,player:玩家,playground:遊樂場,please:請,point:點,police:警察,polite:有禮貌的,pool:水池,poor:貧窮的,popcorn:爆米花,pork:豬肉,position:位置,possible:可能的,post:郵寄,pot:鍋子,potato:馬鈴薯,pound:磅,power:力量,practice:練習,prepare:準備,present:禮物,pretty:漂亮的,price:價格,prince:王子,princess:公主,prize:獎品,problem:問題,program:節目,proud:驕傲的,public:公眾的,pull:拉,pumpkin:南瓜,push:推,put:放置,queen:皇后,question:問題,quick:快速的,quiet:安靜的,quite:相當,rabbit:兔子,radio:收音機,railway:鐵路,rain:雨,rainbow:彩虹,rainy:下雨的,raise:舉起,rat:老鼠,read:閱讀,ready:準備好的,real:真實的,reason:理由,red:紅色的,remember:記得,report:報告,rest:休息,restaurant:餐廳,restroom:洗手間,rice:米飯,rich:富有的,ride:騎乘,right:右邊,ring:戒指,rise:升起,river:河流,road:道路,robot:機器人,rock:岩石,roll:滾動,room:房間,rope:繩子,rose:玫瑰,round:圓形的,rule:規則,run:跑步,sad:悲傷的,safe:安全的,salad:沙拉,sale:特賣,salt:鹽,same:相同的,sand:沙子,sandwich:三明治,Saturday:星期六,save:拯救,say:說,scared:害怕的,school:學校,screen:螢幕,sea:海,season:季節,seat:座位,second:第二,secretary:秘書,see:看見,seed:種子,sell:賣,send:發送,senior:年長的,sense:感覺,sentence:句子,September:九月,serious:嚴肅的,set:設定,seven:七,seventeen:十七,seventy:七十,several:幾個,shake:搖動,shall:將會,shape:形狀,share:分享,shark:鯊魚,sharp:尖銳的,she:她,sheep:綿羊,shine:發光,ship:船,shirt:襯衫,shoe:鞋子,shop:商店,short:短的,should:應該,shoulder:肩膀,shout:大叫,show:展示,shy:害羞的,sick:生病的,side:邊,sidewalk:人行道,sight:視力,sign:標誌,simple:簡單的,since:自從,sing:唱歌,singer:歌手,sister:姐妹,sit:坐,six:六,sixteen:十六,sixty:六十,size:尺寸,skirt:裙子,sky:天空,sleep:睡覺,slow:緩慢的,small:小的,smart:聰明的,smell:聞,smile:微笑,smoke:抽菸,snack:點心,snake:蛇,snow:雪,so:所以,sock:襪子,sofa:沙發,some:一些,someone:某人,something:某事,sometimes:有時候,somewhere:某處,son:兒子,song:歌曲,soon:很快,sorry:抱歉的,sound:聲音,soup:湯,south:南方,space:空間,speak:說話,special:特別的,spell:拼寫,spend:花費,spider:蜘蛛,spoon:湯匙,sports:運動,spring:春天,square:正方形,stand:站立,star:星星,start:開始,station:車站,stay:停留,steak:牛排,still:仍然,stomach:胃,stop:停止,store:商店,story:故事,strange:奇怪的,street:街道,strong:強壯的,student:學生,study:學習,stupid:愚蠢的,successful:成功的,sugar:糖,summer:夏天,sun:太陽,Sunday:星期日,sunny:晴朗的,supermarket:超市,sure:確定的,surprise:驚喜,sweet:甜的,swim:游泳,table:桌子,tail:尾巴,take:拿,talk:說話,tall:高的,tape:膠帶,taste:品嚐,taxi:計程車,tea:茶,teach:教導,teacher:老師,team:隊伍,teenager:青少年,telephone:電話,television:電視,tell:告訴,ten:十,tennis:網球,terrible:可怕的,test:考試,than:比,thank:謝謝,that:那個,the:這,then:然後,there:那裡,these:這些,they:他們,thick:厚的,thin:瘦的,thing:事物,think:思考,third:第三,thirsty:口渴的,thirteen:十三,thirty:三十,this:這個,those:那些,though:雖然,thousand:千,three:三,throat:喉嚨,throw:丟,Thursday:星期四,ticket:票,tiger:老虎,time:時間,tired:疲倦的,to:到,today:今天,together:一起,tomato:番茄,tomorrow:明天,tonight:今晚,too:也,tool:工具,tooth:牙齒,top:頂端,touch:觸摸,towel:毛巾,town:城鎮,toy:玩具,traffic:交通,train:火車,tree:樹,trick:惡作劇,trip:旅行,trouble:麻煩,true:真實的,try:嘗試,Tuesday:星期二,turn:轉向,turtle:烏龜,twelve:十二,twenty:二十,twice:兩次,two:二,type:類型,typhoon:颱風,umbrella:雨傘,uncle:叔叔,under:在下面,understand:了解,until:直到,up:向上,us:我們,use:使用,useful:有用的,vacation:假期,vegetable:蔬菜,very:非常,video:影片,violin:小提琴,visit:拜訪,voice:聲音,wait:等待,waiter:男服務生,waitress:女服務生,wake:醒來,walk:走路,wall:牆壁,wallet:錢包,want:想要,warm:溫暖的,wash:清洗,watch:手錶,water:水,watermelon:西瓜,wave:揮手,way:方式,we:我們,weak:虛弱的,wear:穿著,weather:天氣,Wednesday:星期三,week:星期,weekend:週末,welcome:歡迎,well:好,west:西方,wet:濕的,whale:鯨魚,what:什麼,when:何時,where:何處,whether:是否,which:哪一個,white:白色的,who:誰,whose:誰的,why:為什麼,wife:妻子,will:將會,win:贏,wind:風,window:窗戶,windy:多風的,winter:冬天,wise:明智的,wish:希望,with:與,without:沒有,woman:女人,wonderful:美好的,wood:木頭,word:單字,work:工作,worker:工人,world:世界,worry:擔心,write:寫,writer:作家,wrong:錯誤的,year:年,yellow:黃色的,yes:是的,yesterday:昨天,yet:還沒,you:你,young:年輕的,zoo:動物園";
-
-        const BUILT_IN_VOCAB = RAW_VOCAB_STRING.split(',').map(pair => {
-            const [en, zh] = pair.split(':');
-            return { en, zh };
-        });
+        // ==========================================
+        // 內建雙引擎題庫：國小版 (1200字) & 國中版 (2000字)
+        // ==========================================
+        const ELEMENTARY_VOCAB_STRING = "a:一個,able:能夠的,about:關於,above:在上方,abroad:在國外,across:越過,act:行動,action:動作,actor:男演員,actress:女演員,adult:成人,afraid:害怕的,after:在之後,afternoon:下午,again:再一次,age:年齡,ago:以前,agree:同意,ahead:在前方,air:空氣,airplane:飛機,airport:機場,all:全部,almost:幾乎,along:沿著,already:已經,also:也,always:總是,am:是,America:美國,American:美國人,and:和,angel:天使,angry:生氣的,animal:動物,another:另一個,answer:回答,ant:螞蟻,any:任何的,anyone:任何人,anything:任何事物,apartment:公寓,appear:出現,apple:蘋果,April:四月,are:是,arm:手臂,around:在周圍,arrive:到達,art:藝術,as:如同,ask:詢問,at:在,August:八月,aunt:阿姨,autumn:秋天,away:離開,baby:嬰兒,back:後面,bad:壞的,badminton:羽毛球,bag:袋子,bake:烘烤,bakery:麵包店,ball:球,balloon:氣球,banana:香蕉,band:樂團,bank:銀行,barbecue:烤肉,base:基礎,baseball:棒球,basket:籃子,basketball:籃球,bat:蝙蝠,bath:洗澡,bathroom:浴室,be:是,beach:海灘,bear:熊,beautiful:美麗的,because:因為,become:成為,bed:床,bedroom:臥室,bee:蜜蜂,beef:牛肉,before:在之前,begin:開始,behind:在後面,believe:相信,bell:鈴,belong:屬於,below:在下方,belt:皮帶,bench:長椅,beside:在旁邊,between:在之間,bicycle:腳踏車,big:大的,bird:鳥,bite:咬,black:黑色的,block:街區,blood:血液,blow:吹,blue:藍色的,boat:小船,body:身體,bone:骨頭,book:書本,bookstore:書店,boring:無聊的,born:出生,borrow:借入,boss:老闆,both:兩者,bottle:瓶子,bottom:底部,bowl:碗,box:箱子,boy:男孩,bread:麵包,break:打破,breakfast:早餐,bridge:橋,bright:明亮的,bring:帶來,brother:兄弟,brown:棕色的,brush:刷子,bug:蟲,build:建造,burn:燃燒,bus:公車,business:商業,businessman:商人,busy:忙碌的,but:但是,butter:奶油,butterfly:蝴蝶,buy:買,by:藉由,cabbage:高麗菜,cake:蛋糕,call:呼叫,camel:駱駝,camera:照相機,camp:露營,can:可以,candy:糖果,cap:帽子,car:汽車,card:卡片,care:關心,careful:小心的,carry:攜帶,case:案例,cat:貓,catch:捕捉,celebrate:慶祝,cellphone:手機,cent:分,center:中心,chair:椅子,chance:機會,change:改變,cheap:便宜的,cheat:作弊,check:檢查,cheer:歡呼,cheese:起司,chicken:雞,child:小孩,chocolate:巧克力,choose:選擇,chopsticks:筷子,church:教堂,circle:圓圈,city:城市,class:班級,classmate:同學,classroom:教室,clean:乾淨的,clear:清楚的,clerk:店員,climb:攀爬,clock:時鐘,close:關閉,cloud:雲,cloudy:多雲的,club:俱樂部,coat:外套,coffee:咖啡,cola:可樂,cold:冷的,color:顏色,come:來,comfortable:舒適的,common:常見的,computer:電腦,convenient:方便的,cook:烹調,cookie:餅乾,cool:涼爽的,copy:複製,corner:角落,correct:正確的,cost:花費,cotton:棉花,couch:沙發,count:計算,country:國家,course:課程,cousin:表親,cover:覆蓋,cow:母牛,crazy:瘋狂的,cross:跨越,cry:哭泣,cup:杯子,cut:切割,cute:可愛的,dance:跳舞,dangerous:危險的,dark:黑暗的,date:日期,daughter:女兒,day:白天,dead:死亡的,deal:交易,dear:親愛的,December:十二月,decide:決定,delicious:美味的,dentist:牙醫,department:部門,desk:書桌,dictionary:字典,die:死亡,different:不同的,difficult:困難的,dig:挖掘,dining:用餐,dinner:晚餐,dirty:髒的,discover:發現,dish:菜餚,do:做,doctor:醫生,dog:狗,doll:洋娃娃,dollar:元,door:門,dot:點,down:向下,draw:畫,dream:夢想,dress:洋裝,drink:喝,drive:駕駛,driver:司機,drop:掉落,dry:乾燥的,duck:鴨子,dumpling:水餃,during:在期間,each:每一個,ear:耳朵,early:早的,earth:地球,east:東方,easy:容易的,eat:吃,egg:蛋,eight:八,eighteen:十八,eighty:八十,either:也(用於否定),elementary:基本的,elephant:大象,eleven:十一,else:其他,end:結束,English:英語,enjoy:享受,enough:足夠的,enter:進入,envelope:信封,eraser:橡皮擦,eve:前夕,even:甚至,evening:傍晚,ever:曾經,every:每一個,everyone:每個人,everything:每件事物,example:例子,excellent:優秀的,except:除了,excuse:藉口,exercise:運動,expensive:昂貴的,experience:經驗,eye:眼睛,face:臉,fact:事實,factory:工廠,fail:失敗,fall:秋天,family:家庭,famous:著名的,fan:粉絲,far:遠的,farm:農場,farmer:農夫,fast:快速的,fat:胖的,father:父親,favorite:最喜愛的,February:二月,feel:感覺,festival:節慶,few:很少,fifteen:十五,fifty:五十,fight:打架,fill:充滿,find:找到,fine:好的,finger:手指,finish:完成,fire:火,first:第一,fish:魚,five:五,fix:修理,floor:地板,flower:花,fly:飛,follow:跟隨,food:食物,foot:腳,for:為了,foreign:外國的,foreigner:外國人,forget:忘記,fork:叉子,forty:四十,four:四,fourteen:十四,fox:狐狸,free:自由的,fresh:新鮮的,Friday:星期五,friend:朋友,friendly:友善的,frog:青蛙,from:來自,front:前面,fruit:水果,full:滿的,fun:樂趣,funny:有趣的,future:未來,game:遊戲,garbage:垃圾,garden:花園,gas:瓦斯,get:得到,ghost:鬼,giant:巨人,gift:禮物,girl:女孩,give:給予,glad:高興的,glass:玻璃,glove:手套,go:去,goat:山羊,good:好的,goose:鵝,grade:成績,gram:克,grandfather:祖父,grandmother:祖母,grass:草,gray:灰色的,great:棒的,green:綠色的,ground:地面,group:群體,grow:成長,guess:猜測,guest:客人,guide:引導,guitar:吉他,guy:傢伙,habit:習慣,hair:頭髮,half:一半,hamburger:漢堡,hand:手,handsome:英俊的,happen:發生,happy:快樂的,hard:困難的,hat:帽子,hate:討厭,have:有,he:他,head:頭,headache:頭痛,health:健康,healthy:健康的,hear:聽見,heart:心,heat:熱,heavy:重的,hello:哈囉,help:幫助,helpful:有幫助的,here:這裡,hero:英雄,hide:隱藏,high:高的,hill:山丘,history:歷史,hit:打擊,hobby:嗜好,hold:握住,holiday:假日,home:家,homework:作業,honest:誠實的,hope:希望,horse:馬,hospital:醫院,host:主持人,hot:熱的,hotel:旅館,hour:小時,house:房子,how:如何,hundred:百,hungry:飢餓的,hunt:狩獵,hurry:匆忙,hurt:受傷,husband:丈夫,ice:冰,idea:點子,if:如果,important:重要的,in:在裡面,inside:在內部,interest:興趣,interested:感興趣的,Internet:網路,into:進入,island:島嶼,it:它,jacket:夾克,January:一月,jeans:牛仔褲,job:工作,jog:慢跑,join:加入,joy:喜悅,juice:果汁,July:七月,jump:跳躍,June:六月,junior:較年少的,just:只是,keep:保持,key:鑰匙,kick:踢,kid:小孩,kill:殺死,kilogram:公斤,kind:種類,king:國王,kiss:親吻,kitchen:廚房,kite:風箏,knee:膝蓋,knife:刀子,know:知道,knowledge:知識,lake:湖泊,lamp:燈,land:土地,language:語言,lantern:燈籠,large:巨大的,last:最後的,late:遲的,laugh:大笑,lawyer:律師,lazy:懶惰的,lead:領導,leader:領袖,leaf:葉子,learn:學習,least:最少,leave:離開,left:左邊,leg:腿,lemon:檸檬,lend:借出,less:較少,lesson:課程,let:讓,letter:信件,library:圖書館,lie:躺,life:生活,light:光線,like:喜歡,line:線,lion:獅子,lip:嘴唇,list:清單,listen:聽,little:小的,live:居住,living:活著的,lonely:寂寞的,long:長的,look:看,lose:失去,loud:大聲的,love:愛,low:低的,lucky:幸運的,machine:機器,mad:生氣的,magic:魔術,mail:郵件,mailman:郵差,make:製造,man:男人,many:許多,map:地圖,March:三月,mark:標記,market:市場,married:已婚的,master:大師,matter:事情,May:五月,maybe:也許,meal:餐點,mean:意指,meat:肉,medicine:藥,medium:中等的,meet:遇見,meeting:會議,menu:菜單,mile:英里,milk:牛奶,million:百萬,mind:介意,minute:分鐘,miss:想念,mistake:錯誤,moment:時刻,Monday:星期一,money:錢,monkey:猴子,month:月份,moon:月亮,more:更多,morning:早晨,most:最多,mother:母親,motorcycle:機車,mountain:山,mouse:老鼠,mouth:嘴巴,move:移動,movie:電影,much:許多,museum:博物館,music:音樂,must:必須,name:名字,national:國家的,nature:自然,near:在附近,neck:脖子,need:需要,neighbor:鄰居,never:從不,new:新的,news:新聞,next:下一個,nice:美好的,night:夜晚,nine:九,nineteen:十九,ninety:九十,no:不,nobody:沒有人,nod:點頭,noise:噪音,noodle:麵條,noon:中午,north:北方,nose:鼻子,not:不,note:筆記,nothing:沒有事物,notice:注意,November:十一月,now:現在,number:數字,nurse:護士,ocean:海洋,o'clock:點鐘,October:十月,of:的,off:離開,office:辦公室,officer:軍官,often:經常,oil:油,OK:好的,old:老的,on:在上面,once:一次,one:一,only:只有,open:打開,orange:橘子,order:點餐,other:其他的,out:外面,outside:在外部,over:超過,own:自己的,pack:打包,package:包裹,page:頁面,paint:畫畫,pair:一雙,pants:長褲,papaya:木瓜,paper:紙張,parent:父母,park:公園,part:部分,party:派對,pass:通過,past:過去,pay:支付,PE:體育,pen:筆,pencil:鉛筆,people:人們,perhaps:或許,person:人,pet:寵物,piano:鋼琴,pick:挑選,picnic:野餐,picture:圖片,pie:派,piece:碎片,pig:豬,pin:大頭針,pink:粉紅色,pipe:管子,pizza:披薩,place:地方,plan:計畫,planet:行星,plant:植物,play:玩,player:玩家,playground:遊樂場,please:請,point:點,police:警察,polite:有禮貌的,pool:水池,poor:貧窮的,popcorn:爆米花,pork:豬肉,position:位置,possible:可能的,post:郵寄,pot:鍋子,potato:馬鈴薯,pound:磅,power:力量,practice:練習,prepare:準備,present:禮物,pretty:漂亮的,price:價格,prince:王子,princess:公主,prize:獎品,problem:問題,program:節目,proud:驕傲的,public:公眾的,pull:拉,pumpkin:南瓜,push:推,put:放置,queen:皇后,question:問題,quick:快速的,quiet:安靜的,quite:相當,rabbit:兔子,radio:收音機,railway:鐵路,rain:雨,rainbow:彩虹,rainy:下雨的,raise:舉起,rat:老鼠,read:閱讀,ready:準備好的,real:真實的,reason:理由,red:紅色的,remember:記得,report:報告,rest:休息,restaurant:餐廳,restroom:洗手間,rice:米飯,rich:富有的,ride:騎乘,right:右邊,ring:戒指,rise:升起,river:河流,road:道路,robot:機器人,rock:岩石,roll:滾動,room:房間,rope:繩子,rose:玫瑰,round:圓形的,rule:規則,run:跑步,sad:悲傷的,safe:安全的,salad:沙拉,sale:特賣,salt:鹽,same:相同的,sand:沙子,sandwich:三明治,Saturday:星期六,save:拯救,say:說,scared:害怕的,school:學校,screen:螢幕,sea:海,season:季節,seat:座位,second:第二,secretary:秘書,see:看見,seed:種子,sell:賣,send:發送,senior:年長的,sense:感覺,sentence:句子,September:九月,serious:嚴肅的,set:設定,seven:七,seventeen:十七,seventy:七十,several:幾個,shake:搖動,shall:將會,shape:形狀,share:分享,shark:鯊魚,sharp:尖銳的,she:她,sheep:綿羊,shine:發光,ship:船,shirt:襯衫,shoe:鞋子,shop:商店,short:短的,should:應該,shoulder:肩膀,shout:大叫,show:展示,shy:害羞的,sick:生病的,side:邊,sidewalk:人行道,sight:視力,sign:標誌,simple:簡單的,since:自從,sing:唱歌,singer:歌手,sister:姐妹,sit:坐,six:六,sixteen:十六,sixty:六十,size:尺寸,skirt:裙子,sky:天空,sleep:睡覺,slow:緩慢的,small:小的,smart:聰明的,smell:聞,smile:微笑,smoke:抽菸,snack:點心,snake:蛇,snow:雪,so:所以,sock:襪子,sofa:沙發,some:一些,someone:某人,something:某事,sometimes:有時候,somewhere:某處,son:兒子,song:歌曲,soon:很快,sorry:抱歉的,sound:聲音,soup:湯,south:南方,space:空間,speak:說話,special:特別的,spell:拼寫,spend:花費,spider:蜘蛛,spoon:湯匙,sports:運動,spring:春天,square:正方形,stand:站立,star:星星,start:開始,station:車站,stay:停留,steak:牛排,still:仍然,stomach:胃,stop:停止,store:商店,story:故事,strange:奇怪的,street:街道,strong:強壯的,student:學生,study:學習,stupid:愚蠢的,successful:成功的,sugar:糖,summer:夏天,sun:太陽,Sunday:星期日,sunny:晴朗的,supermarket:超市,sure:確定的,surprise:驚喜,sweet:甜的,swim:游泳,table:桌子,tail:尾巴,take:拿,talk:說話,tall:高的,tape:膠帶,taste:品嚐,taxi:計程車,tea:茶,teach:教導,teacher:老師,team:隊伍,teenager:青少年,telephone:電話,television:電視,tell:告訴,ten:十,tennis:網球,terrible:可怕的,test:考試,than:比,thank:謝謝,that:那個,the:這,then:然後,there:那裡,these:這些,they:他們,thick:厚的,thin:瘦的,thing:事物,think:思考,third:第三,thirsty:口渴的,thirteen:十三,thirty:三十,this:這個,those:那些,though:雖然,thousand:千,three:三,throat:喉嚨,throw:丟,Thursday:星期四,ticket:票,tiger:老虎,time:時間,tired:疲倦的,to:到,today:今天,together:一起,tomato:番茄,tomorrow:明天,tonight:今晚,too:也,tool:工具,tooth:牙齒,top:頂端,touch:觸摸,towel:毛巾,town:城鎮,toy:玩具,traffic:交通,train:火車,tree:樹,trick:惡作劇,trip:旅行,trouble:麻煩,true:真實的,try:嘗試,Tuesday:星期二,turn:轉向,turtle:烏龜,twelve:十二,twenty:二十,twice:兩次,two:二,type:類型,typhoon:颱風,umbrella:雨傘,uncle:叔叔,under:在下面,understand:了解,until:直到,up:向上,us:我們,use:使用,useful:有用的,vacation:假期,vegetable:蔬菜,very:非常,video:影片,violin:小提琴,visit:拜訪,voice:聲音,wait:等待,waiter:男服務生,waitress:女服務生,wake:醒來,walk:走路,wall:牆壁,wallet:錢包,want:想要,warm:溫暖的,wash:清洗,watch:手錶,water:水,watermelon:西瓜,wave:揮手,way:方式,we:我們,weak:虛弱的,wear:穿著,weather:天氣,Wednesday:星期三,week:星期,weekend:週末,welcome:歡迎,well:好,west:西方,wet:濕的,whale:鯨魚,what:什麼,when:何時,where:何處,whether:是否,which:哪一個,white:白色的,who:誰,whose:誰的,why:為什麼,wife:妻子,will:將會,win:贏,wind:風,window:窗戶,windy:多風的,winter:冬天,wise:明智的,wish:希望,with:與,without:沒有,woman:女人,wonderful:美好的,wood:木頭,word:單字,work:工作,worker:工人,world:世界,worry:擔心,write:寫,writer:作家,wrong:錯誤的,year:年,yellow:黃色的,yes:是的,yesterday:昨天,yet:還沒,you:你,young:年輕的,zoo:動物園";
+        
+        const JUNIOR_VOCAB_STRING = "ability:能力,abroad:在國外,absent:缺席的,accept:接受,accident:意外,achieve:達成,active:活躍的,activity:活動,actor:男演員,actress:女演員,add:增加,address:地址,admire:欽佩,adult:成人,advance:前進,advantage:優點,advice:建議,advise:勸告,affair:事務,affect:影響,against:反對,aim:目標,aircraft:飛行器,airline:航線,alarm:警報,album:相簿,alike:相似的,alive:活著的,allow:允許,alone:單獨的,aloud:大聲地,alphabet:字母,although:雖然,altogether:完全地,amount:數量,ancient:古代的,anger:憤怒,ankle:腳踝,anyhow:無論如何,anyway:無論如何,anywhere:任何地方,apologize:道歉,apply:申請,appreciate:欣賞,area:區域,argue:爭論,armchair:扶手椅,army:軍隊,arrange:安排,arrest:逮捕,arrow:箭,article:文章,artist:藝術家,ashamed:羞愧的,asleep:睡著的,assistant:助手,assume:假設,attack:攻擊,attend:出席,attention:注意力,audience:觀眾,available:可用的,avoid:避免,awake:醒著的,award:獎品,babysitter:保母,backward:向後地,balcony:陽台,barber:理髮師,bark:吠叫,basement:地下室,basic:基本的,beat:打擊,beauty:美麗,beer:啤酒,beginner:初學者,beginning:開始,behave:表現,besides:此外,beyond:超越,bill:帳單,biology:生物學,birth:出生,bitter:苦的,blackboard:黑板,blame:責備,blank:空白的,blanket:毯子,blind:盲的,blouse:女襯衫,board:木板,boil:沸騰,bomb:炸彈,bookcase:書櫃,bother:打擾,bow:鞠躬,brain:大腦,branch:樹枝,brave:勇敢的,brick:磚塊,broad:寬廣的,broadcast:廣播,bucket:水桶,buffet:自助餐,building:建築物,bun:小圓麵包,bundle:束,burst:爆裂,button:按鈕,cable:電纜,cafeteria:自助餐廳,cage:籠子,calendar:日曆,calm:平靜的,campus:校園,cancel:取消,cancer:癌症,candle:蠟燭,capital:首都,captain:船長,careless:粗心的,carpet:地毯,carrot:胡蘿蔔,cart:手推車,cash:現金,cassette:卡式磁帶,castle:城堡,cause:原因,ceiling:天花板,centimeter:公分,central:中央的,century:世紀,cereal:穀物,certain:確定的,chalk:粉筆,channel:頻道,character:角色,charge:索價,chart:圖表,chase:追逐,chemistry:化學,chess:西洋棋,chief:首領,childhood:童年,choice:選擇,clap:拍手,classic:古典的,clever:聰明的,climate:氣候,closet:衣櫥,cloth:布料,clothes:衣服,coach:教練,coal:煤炭,coast:海岸,cockroach:蟑螂,coin:硬幣,collect:收集,college:大學,comb:梳子,comedy:喜劇,command:命令,comment:評論,company:公司,compare:比較,complain:抱怨,complete:完成,concern:關心,confident:自信的,confuse:使困惑,congratulate:祝賀,consider:考慮,contact:接觸,continue:繼續,contract:合約,control:控制,conversation:對話,corn:玉米,cough:咳嗽,could:能夠,couple:一對,courage:勇氣,court:法庭,crab:螃蟹,cream:鮮奶油,create:創造,credit:信用,crime:犯罪,crowd:人群,crowded:擁擠的,cruel:殘忍的,culture:文化,cure:治療,curious:好奇的,current:目前的,curtain:窗簾,curve:曲線,custom:習俗,daily:每日的,damage:損害,danger:危險,dawn:黎明,death:死亡,debate:辯論,decision:決定,decorate:裝飾,decrease:減少,deep:深的,deer:鹿,defeat:擊敗,degree:程度,delay:延遲,deliver:遞送,demand:要求,depend:依賴,describe:描述,desert:沙漠,design:設計,desire:渴望,dessert:甜點,destroy:破壞,detail:細節,determine:決定,develop:發展,diet:飲食,difference:差異,difficulty:困難,dinosaur:恐龍,direct:直接的,direction:方向,disappear:消失,discuss:討論,discussion:討論,disease:疾病,distance:距離,distant:遙遠的,divide:劃分,dodge:閃躲,double:雙倍的,doubt:懷疑,doughnut:甜甜圈,download:下載,downstairs:樓下,downtown:市中心,drag:拖拉,dragon:龍,drawer:抽屜,drug:藥物,drum:鼓,dumb:啞的,duty:責任,eagle:老鷹,edge:邊緣,education:教育,effect:效果,effort:努力,elder:較年長的,elect:選舉,email:電子郵件,emotion:情緒,emphasize:強調,employ:雇用,empty:空的,encourage:鼓勵,enemy:敵人,energy:能量,engine:引擎,engineer:工程師,entire:整個的,entrance:入口,environment:環境,equal:平等的,error:錯誤,especially:特別地,event:事件,everywhere:到處,exact:精確的,exam:考試,examine:檢查,excite:使興奮,exist:存在,expect:期待,explain:解釋,express:表達,extra:額外的,fair:公平的,false:錯誤的,fancy:華麗的,fashion:時尚,fault:過錯,favor:偏愛,fear:恐懼,fee:費用,feed:餵食,feeling:感覺,female:女性的,fence:柵欄,fever:發燒,field:田野,film:電影,final:最後的,firm:堅固的,flag:旗幟,flash:閃光,flat:平坦的,flight:飛行,focus:焦點,fog:霧,fool:傻瓜,foolish:愚蠢的,force:力量,forest:森林,forgive:原諒,form:形式,formal:正式的,former:前者的,forward:向前的,freedom:自由,freeze:結冰,frighten:使驚嚇,fry:油炸,furniture:家具,gain:獲得,garage:車庫,gate:大門,gather:聚集,general:一般的,generation:世代,generous:慷慨的,gentle:溫柔的,geography:地理學,goal:目標,god:神,gold:黃金,golden:金色的,goodbye:再見,government:政府,grandchild:孫子,granddaughter:孫女,grandson:孫子,grape:葡萄,greet:問候,guard:守衛,gun:槍,haircut:理髮,hall:大廳,ham:火腿,hammer:鐵鎚,handkerchief:手帕,handle:處理,hang:懸掛,hardly:幾乎不,height:高度,helicopter:直升機,hen:母雞,highway:公路,hip:臀部,hippo:河馬,hire:雇用,hole:洞,homesick:想家的,honey:蜂蜜,honor:榮譽,horrible:可怕的,however:然而,hug:擁抱,huge:巨大的,human:人類,humor:幽默,hunger:飢餓,ignore:忽略,ill:生病的,image:影像,imagine:想像,improve:改善,include:包括,income:收入,increase:增加,independent:獨立的,indicate:指出,influence:影響,information:資訊,ink:墨水,insect:昆蟲,insist:堅持,inspire:啟發,instance:例子,instant:立即的,instrument:樂器,intelligent:聰明的,international:國際的,interrupt:打斷,interview:面試,introduce:介紹,invent:發明,invite:邀請,iron:鐵,jam:果醬,jazz:爵士樂,joke:笑話,journalist:記者,judge:法官,kangaroo:袋鼠,kilometer:公里,kindergarten:幼稚園,kingdom:王國,kitten:小貓,knock:敲,law:法律,lettuce:萵苣,level:等級,lick:舔,lift:舉起,lightning:閃電,likely:可能的,limit:限制,link:連結,liquid:液體,liter:公升,loaf:一條麵包,local:當地的,lock:鎖,loose:鬆的,loser:輸家,lovely:可愛的,lunch:午餐,magazine:雜誌,magician:魔術師,main:主要的,major:主要的,manager:經理,mango:芒果,manner:禮貌,marriage:婚姻,mask:面具,mass:大量,mat:墊子,match:比賽,mate:同伴,material:材料,mathematics:數學,maximum:最大值,meaning:意義,measure:測量,mechanic:技工,melody:旋律,melon:瓜,melt:融化,member:成員,memory:記憶,men:男人們,message:訊息,metal:金屬,meter:公尺,method:方法,microphone:麥克風,middle:中間,midnight:午夜,minor:次要的,minus:減去,mirror:鏡子,missile:飛彈,mission:任務,mix:混合,model:模型,modern:現代的,monster:怪物,motion:動作,movement:運動,mud:泥巴,musician:音樂家,nail:指甲,narrow:狹窄的,nation:國家,natural:自然的,naughty:調皮的,nearly:幾乎,neat:整潔的,necessary:必需的,necklace:項鍊,needle:針,negative:負面的,neither:兩者都不,nephew:姪子,nervous:緊張的,nest:鳥巢,net:網子,newspaper:報紙,niece:姪女,noisy:吵鬧的,none:沒有,nor:也不,normal:正常的,northern:北方的,notebook:筆記本,noun:名詞,novel:小說,nut:堅果,obey:服從,object:物體,offer:提供,official:官方的,onion:洋蔥,operate:操作,opinion:意見,opportunity:機會,opposite:相反的,or:或,ordinary:平凡的,organize:組織,otherwise:否則,ought:應該,ounce:盎司,oven:烤箱,overcome:克服,overpass:天橋,overseas:海外的,owe:欠,owl:貓頭鷹,owner:擁有者,ox:公牛,pain:疼痛,painful:痛苦的,painter:畫家,pajamas:睡衣,pale:蒼白的,pan:平底鍋,panda:熊貓,pardon:原諒,parrot:鸚鵡,passenger:乘客,paste:黏貼,path:小徑,patient:有耐心的,pattern:圖案,pause:暫停,peace:和平,peaceful:和平的,peach:桃子,pear:梨子,penguin:企鵝,pepper:胡椒,perfect:完美的,period:期間,personal:個人的,photo:照片,photography:攝影,phrase:片語,pigeon:鴿子,pile:堆,pillow:枕頭,pineapple:鳳梨,pitch:投擲,plain:平原,plate:盤子,platform:月台,pleasant:令人愉快的,pleased:高興的,pleasure:愉快,plenty:大量,plus:加上,pocket:口袋,poem:詩,poet:詩人,poison:毒藥,pollute:污染,pollution:污染,pond:池塘,popular:受歡迎的,population:人口,positive:積極的,postcard:明信片,pour:倒,powder:粉末,powerful:強大的,praise:讚美,pray:祈禱,precious:珍貴的,prefer:偏好,presence:出席,president:總統,press:按壓,prevent:預防,pride:驕傲,priest:牧師,primary:首要的,principal:校長,principle:原則,print:列印,printer:印表機,private:私人的,probably:或許,produce:生產,product:產品,production:生產,professor:教授,progress:進步,project:計畫,promise:答應,pronounce:發音,proof:證明,proper:適當的,protect:保護,prove:證明,provide:提供,pump:幫浦,punish:處罰,pupil:小學生,puppy:小狗,purchase:購買,pure:純潔的,purple:紫色的,purpose:目的,purse:錢包,puzzle:謎,quality:品質,quantity:數量,quarrel:爭吵,quarter:四分之一,quit:放棄,quiz:小考,race:比賽,raincoat:雨衣,rapid:快速的,rare:罕見的,rather:寧願,reach:到達,realize:了解,really:真地,receive:收到,recent:最近的,recognize:認出,record:記錄,recover:恢復,reduce:減少,refrigerator:冰箱,refuse:拒絕,regard:認為,region:地區,regular:規律的,reject:拒絕,relative:親戚,relax:放鬆,release:釋放,religion:宗教,remain:保持,remind:提醒,remove:移除,rent:租金,repair:修理,repeat:重複,replace:取代,reply:回覆,reporter:記者,require:需要,respect:尊重,responsible:負責任的,result:結果,return:返回,review:複習,revise:修訂,risk:風險,rob:搶劫,role:角色,roof:屋頂,root:根,rough:粗糙的,route:路線,row:排,royal:皇家的,rub:摩擦,rubber:橡膠,rubbish:垃圾,rude:無禮的,ruin:毀壞,ruler:尺,rush:衝,safety:安全,sail:航行,sailor:水手,salesman:推銷員,sample:樣品,satisfy:使滿意,sauce:醬汁,sausage:香腸,scale:規模,scarf:圍巾,scene:場景,scenery:風景,schedule:行程表,science:科學,scientist:科學家,scissors:剪刀,score:分數,search:搜尋,secret:秘密,section:部分,seek:尋找,seem:似乎,seesaw:翹翹板,seldom:很少,select:選擇,selfish:自私的,separate:分開,servant:僕人,serve:服務,service:服務,settle:解決,severe:嚴重的,sew:縫,shadow:影子,sheet:床單,shelf:架子,shock:震驚,shoot:射擊,shore:海岸,shorts:短褲,shower:陣雨,shrimp:蝦,silence:沉默,silent:安靜的,silk:絲綢,silly:愚蠢的,silver:銀色的,similar:相似的,sincere:真誠的,single:單一的,sink:水槽,sir:先生,situation:情況,skate:溜冰,skill:技巧,skillful:熟練的,skin:皮膚,slave:奴隸,sleepy:想睡的,slide:滑動,slight:輕微的,slim:苗條的,slip:滑倒,slipper:拖鞋,smooth:平滑的,snail:蝸牛,sneaker:運動鞋,sneeze:打噴嚏,snowman:雪人,snowy:下雪的,soap:肥皂,soccer:足球,social:社會的,society:社會,soda:汽水,soft:柔軟的,soil:土壤,soldier:士兵,solve:解決,somebody:某人,someday:某天,sore:疼痛的,sort:種類,soul:靈魂,sour:酸的,source:來源,southern:南方的,soybean:大豆,spaghetti:義大利麵,speaker:演講者,speech:演講,speed:速度,spirit:精神,spite:惡意,split:分裂,spoil:破壞,stairs:樓梯,stamp:郵票,standard:標準,state:狀態,stationary:文具,statue:雕像,steal:偷竊,steam:蒸氣,step:步驟,stick:棍子,sting:刺,stone:石頭,storm:暴風雨,stove:火爐,straight:直的,stranger:陌生人,straw:吸管,strawberry:草莓,stream:溪流,strength:力量,stress:壓力,strict:嚴格的,strike:打擊,string:細繩,struggle:掙扎,style:風格,subject:主題,succeed:成功,success:成功,such:如此的,sudden:突然的,suffer:受苦,suggest:建議,suit:套裝,suitcase:行李箱,super:超級的,supper:晚餐,supply:供應,support:支持,surface:表面,swallow:吞嚥,swan:天鵝,swear:發誓,sweat:汗水,sweater:毛衣,sweep:掃,swing:鞦韆,symbol:象徵,system:系統,talent:才華,talkative:健談的,tangerine:橘子,tank:坦克,task:任務,tax:稅,tear:眼淚,tease:取笑,temper:脾氣,temperature:溫度,temple:寺廟,tent:帳篷,term:術語,terrify:使恐懼,textbook:教科書,thankful:感謝的,theater:劇院,therefore:因此,thief:小偷,thought:思想,thread:線,through:透過,thumb:拇指,thunder:雷聲,tidy:整潔的,tie:領帶,tight:緊的,till:直到,tiny:微小的,tip:提示,tire:輪胎,title:標題,toast:吐司,toe:腳趾,tofu:豆腐,toilet:廁所,toothache:牙痛,toothbrush:牙刷,toothpaste:牙膏,topic:主題,total:總計,tough:堅韌的,tour:旅遊,toward:朝向,tower:塔,trace:痕跡,track:軌道,trade:貿易,tradition:傳統,traditional:傳統的,trap:陷阱,trash:垃圾,travel:旅行,treasure:寶藏,treat:對待,treatment:治療,triangle:三角形,trousers:長褲,truck:卡車,trumpet:小號,trust:信任,truth:真相,T-shirt:T恤,tub:浴缸,tube:管子,tune:曲調,turkey:火雞,twin:雙胞胎,ugly:醜陋的,underline:劃底線,underpass:地下道,underwear:內衣,unhappy:不快樂的,uniform:制服,unique:獨特的,universe:宇宙,university:大學,upon:在之上,upper:較高的,upset:心煩的,upstairs:樓上,user:使用者,usual:通常的,usually:通常地,valley:山谷,valuable:有價值的,value:價值,various:各種的,verb:動詞,vessel:船隻,victory:勝利,view:風景,village:村莊,vinegar:醋,visitor:訪客,vocabulary:字彙,volleyball:排球,volume:音量,vote:投票,waist:腰,walkman:隨身聽,wander:漫步,war:戰爭,warn:警告,washing machine:洗衣機,waste:浪費,waterfall:瀑布,wealth:財富,wealthy:富有的,weapon:武器,weave:編織,web:網,website:網站,weed:雜草,weekday:平日,weigh:稱重,weight:重量,western:西方的,whatever:無論什麼,wheat:小麥,wheel:輪子,whenever:無論何時,wherever:無論哪裡,while:當,whip:鞭子,whisper:耳語,whistle:吹口哨,whoever:無論誰,whole:全部的,whom:誰,widow:寡婦,wine:葡萄酒,wire:電線,within:在之內,wolf:狼,women:女人們,wonder:想知道,wooden:木製的,wool:羊毛,worm:蠕蟲,worse:更糟的,worst:最糟的,worth:值得的,wound:傷口,wrist:手腕,yard:院子,yell:大叫,youth:青春,zebra:斑馬,zero:零";
 
         // --- 工具與解析函式 ---
         const shuffleArray = (array) => {
@@ -179,6 +178,7 @@
         // --- 主程式開始 ---
         function App() {
             const [appState, setAppState] = useState('setup');
+            const [vocabLevel, setVocabLevel] = useState('elementary'); // 預設國小版
             const [startDate, setStartDate] = useState(formatDate(new Date())); 
             
             const [globalVocab, setGlobalVocab] = useState([]); 
@@ -197,43 +197,52 @@
             const [userInput, setUserInput] = useState('');
             const [isRecording, setIsRecording] = useState(false);
             
-            // 加入備份與還原視窗狀態
+            // 視窗與錯誤狀態
             const [showBackup, setShowBackup] = useState(false);
-            
-            // 語音硬體錯誤狀態 (控制略過按鈕顯示)
             const [speechError, setSpeechError] = useState(false);
 
-            // 全域靜音解鎖：攔截使用者的第一次互動
+            // 全域靜音解鎖
             useEffect(() => {
                 const unlockAudio = () => {
                     AudioEngine.init();
                     document.removeEventListener('click', unlockAudio);
                     document.removeEventListener('touchstart', unlockAudio);
                 };
-                
                 document.addEventListener('click', unlockAudio, { once: true });
                 document.addEventListener('touchstart', unlockAudio, { once: true });
-                
                 return () => {
                     document.removeEventListener('click', unlockAudio);
                     document.removeEventListener('touchstart', unlockAudio);
                 };
             }, []);
 
+            // 系統初始化與載入
             useEffect(() => {
-                const savedStart = localStorage.getItem('wordMasterStartDate');
-                const savedRecords = localStorage.getItem('wordMasterDailyRecords');
-                const savedVocab = localStorage.getItem('wordMasterGlobalVocab');
+                const savedLevel = localStorage.getItem('wordMasterVocabLevel') || 'elementary';
+                setVocabLevel(savedLevel);
                 
+                // 獨立後綴碼區分國小與國中儲存區
+                const suffix = savedLevel === 'junior' ? '_junior' : '';
+                const savedStart = localStorage.getItem('wordMasterStartDate' + suffix);
+                const savedRecords = localStorage.getItem('wordMasterDailyRecords' + suffix);
+                const savedVocab = localStorage.getItem('wordMasterGlobalVocab' + suffix);
+                
+                const vocabStr = savedLevel === 'junior' ? JUNIOR_VOCAB_STRING : ELEMENTARY_VOCAB_STRING;
+                const parsedVocab = vocabStr.split(',').map(pair => {
+                    const [en, zh] = pair.split(':');
+                    return { en, zh };
+                });
+
                 if (savedVocab) {
                     setGlobalVocab(JSON.parse(savedVocab));
                 } else {
-                    const shuffled = shuffleArray(BUILT_IN_VOCAB);
+                    const shuffled = shuffleArray(parsedVocab);
                     setGlobalVocab(shuffled);
-                    localStorage.setItem('wordMasterGlobalVocab', JSON.stringify(shuffled));
+                    localStorage.setItem('wordMasterGlobalVocab' + suffix, JSON.stringify(shuffled));
                 }
 
                 if (savedRecords) setDailyRecords(JSON.parse(savedRecords));
+                else setDailyRecords({});
                 
                 if (savedStart && savedStart !== "undefined" && savedStart !== "null") {
                     setStartDate(savedStart);
@@ -244,9 +253,45 @@
                 }
             }, []);
 
+            // 在設定頁面切換版本時，嘗試載入該版本的專屬日期
+            const handleLevelChange = (newLevel) => {
+                setVocabLevel(newLevel);
+                const suffix = newLevel === 'junior' ? '_junior' : '';
+                const savedStart = localStorage.getItem('wordMasterStartDate' + suffix);
+                if (savedStart && savedStart !== "undefined" && savedStart !== "null") {
+                    setStartDate(savedStart);
+                } else {
+                    setStartDate(formatDate(new Date()));
+                }
+            };
+
             const handleSetup = () => {
                 const finalDate = startDate || formatDate(new Date());
-                localStorage.setItem('wordMasterStartDate', finalDate);
+                const isJunior = vocabLevel === 'junior';
+                const suffix = isJunior ? '_junior' : '';
+
+                const vocabStr = isJunior ? JUNIOR_VOCAB_STRING : ELEMENTARY_VOCAB_STRING;
+                const parsedVocab = vocabStr.split(',').map(pair => {
+                    const [en, zh] = pair.split(':');
+                    return { en, zh };
+                });
+
+                localStorage.setItem('wordMasterVocabLevel', vocabLevel);
+                localStorage.setItem('wordMasterStartDate' + suffix, finalDate);
+                
+                let currentVocab = [];
+                const savedVocab = localStorage.getItem('wordMasterGlobalVocab' + suffix);
+                if (savedVocab) {
+                     currentVocab = JSON.parse(savedVocab);
+                } else {
+                     currentVocab = shuffleArray(parsedVocab);
+                     localStorage.setItem('wordMasterGlobalVocab' + suffix, JSON.stringify(currentVocab));
+                }
+                setGlobalVocab(currentVocab);
+                
+                const savedRecords = localStorage.getItem('wordMasterDailyRecords' + suffix);
+                setDailyRecords(savedRecords ? JSON.parse(savedRecords) : {});
+
                 setStartDate(finalDate);
                 setAppState('calendar');
                 AudioEngine.init(); 
@@ -297,7 +342,7 @@
                 setScore(0);
                 setFeedback(null);
                 setWrongWords([]);
-                setSpeechError(false); // 重置錯誤狀態
+                setSpeechError(false); 
                 setCurrentTestMode(mode);
                 setAppState(mode);
                 AudioEngine.init();
@@ -331,7 +376,7 @@
 
             const handleAnswer = (isCorrect) => {
                 let updatedWrongWords = [...wrongWords];
-                setSpeechError(false); // 隱藏略過按鈕
+                setSpeechError(false); 
 
                 if (isCorrect) {
                     setScore(prev => prev + 10);
@@ -372,7 +417,9 @@
                                     const newRecords = { ...prev };
                                     if (!newRecords[dateStr]) newRecords[dateStr] = {};
                                     newRecords[dateStr][currentTestMode] = Math.max(newRecords[dateStr][currentTestMode] || 0, finalScore);
-                                    localStorage.setItem('wordMasterDailyRecords', JSON.stringify(newRecords));
+                                    
+                                    const suffix = vocabLevel === 'junior' ? '_junior' : '';
+                                    localStorage.setItem('wordMasterDailyRecords' + suffix, JSON.stringify(newRecords));
                                     return newRecords;
                                 });
                             }
@@ -396,19 +443,13 @@
             };
 
             const handleSpeak = () => {
-                // 1. 環境安全檢查
                 if (window.isSecureContext === false) {
                     setNotification('⚠️ 安全限制：語音功能必須在「HTTPS 安全連線」下才能啟用！如果是直接點開檔案 (file://)，瀏覽器會強制封鎖麥克風。請點擊「略過此題」。');
                     setSpeechError(true);
                     return;
                 }
-
-                // 2. 判斷是否被嵌入在 iframe 中 (專門抓出 Google 協作平台)
                 const isIframe = window.self !== window.top;
-
                 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-                
-                // 3. 瀏覽器是否支援檢查
                 if (!SpeechRecognition) {
                     setNotification('❌ 瀏覽器不支援：建議使用 Chrome、Edge 或 Safari，或點擊「略過此題」。');
                     setSpeechError(true);
@@ -442,7 +483,7 @@
                     let errorMsg = `讀取失敗 (${event.error})`;
                     if (event.error === 'not-allowed') {
                         if (isIframe) {
-                            errorMsg = '偵測到網頁被嵌入在框架中 (如 Google 協作平台)，該平台封鎖了麥克風權限且無法透過程式破解。請將檔案改放至 Vercel 等空間，或點擊下方「略過此題」。';
+                            errorMsg = '偵測到網頁被嵌入在框架中，平台封鎖了麥克風。請改放至 Vercel 等空間，或點擊下方「略過此題」。';
                         } else {
                             errorMsg = '麥克風未授權，或是瀏覽器因為安全考量強制封鎖了它。';
                         }
@@ -453,12 +494,10 @@
                     }
                     setNotification(`無法錄音：${errorMsg}`);
                     setIsRecording(false);
-                    // 出現錯誤時，顯示「略過」按鈕，不讓使用者卡關
                     setSpeechError(true); 
                 };
                 
                 recognition.onend = () => setIsRecording(false);
-                
                 try {
                     recognition.start();
                 } catch(e) {
@@ -473,7 +512,7 @@
                 textarea.select();
                 try {
                     document.execCommand('copy');
-                    setNotification('✅ 備份代碼已複製！請妥善保存於記事本或 LINE 中。');
+                    setNotification('✅ 備份代碼已複製！請妥善保存。');
                 } catch(e) {
                     setNotification('請手動長按代碼全選並複製喔！');
                 }
@@ -484,11 +523,33 @@
                     const val = document.getElementById('backup-data').value;
                     const parsed = JSON.parse(val);
                     if (parsed.start && parsed.records) {
-                        localStorage.setItem('wordMasterStartDate', parsed.start);
-                        localStorage.setItem('wordMasterDailyRecords', JSON.stringify(parsed.records));
+                        const restoredLevel = parsed.level || 'elementary';
+                        const suffix = restoredLevel === 'junior' ? '_junior' : '';
+                        
+                        localStorage.setItem('wordMasterVocabLevel', restoredLevel);
+                        localStorage.setItem('wordMasterStartDate' + suffix, parsed.start);
+                        localStorage.setItem('wordMasterDailyRecords' + suffix, JSON.stringify(parsed.records));
+                        
+                        setVocabLevel(restoredLevel);
                         setStartDate(parsed.start);
                         setDailyRecords(parsed.records);
-                        setNotification('✨ 進度還原成功！已讀取您的測驗紀錄！');
+                        
+                        const vocabStr = restoredLevel === 'junior' ? JUNIOR_VOCAB_STRING : ELEMENTARY_VOCAB_STRING;
+                        const parsedVocab = vocabStr.split(',').map(pair => {
+                            const [en, zh] = pair.split(':');
+                            return { en, zh };
+                        });
+
+                        const savedVocab = localStorage.getItem('wordMasterGlobalVocab' + suffix);
+                        if (savedVocab) {
+                            setGlobalVocab(JSON.parse(savedVocab));
+                        } else {
+                            const shuffled = shuffleArray(parsedVocab);
+                            setGlobalVocab(shuffled);
+                            localStorage.setItem('wordMasterGlobalVocab' + suffix, JSON.stringify(shuffled));
+                        }
+
+                        setNotification(`✨ 還原成功！已為您切換至${restoredLevel === 'junior' ? '國中版' : '國小版'}並讀取紀錄！`);
                         setShowBackup(false);
                     } else {
                         throw new Error("格式錯誤");
@@ -516,6 +577,7 @@
             const renderBackupModal = () => {
                 if (!showBackup) return null;
                 const currentData = JSON.stringify({
+                    level: vocabLevel,
                     start: startDate,
                     records: dailyRecords
                 });
@@ -523,10 +585,10 @@
                     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
                         <div className="bg-white rounded-3xl p-6 w-full max-w-md shadow-2xl relative animate-pop">
                             <h2 className="text-2xl font-black text-gray-800 mb-2 flex items-center">
-                                💾 備份與還原進度
+                                💾 備份與還原 ({vocabLevel === 'junior' ? '國中版' : '國小版'})
                             </h2>
                             <p className="text-sm text-gray-500 mb-4 font-bold bg-yellow-50 p-2 rounded-lg border border-yellow-200">
-                                打卡紀錄保存在這台設備的瀏覽器中。若要更換設備，請複製以下代碼保存，隨時貼上還原。
+                                紀錄保存在這台設備。若要更換設備，請複製代碼隨時貼上還原。
                             </p>
                             <textarea
                                 id="backup-data"
@@ -556,7 +618,7 @@
                         <ArrowLeft className="w-5 h-5" />
                         <span>返回選單</span>
                     </button>
-                    <div className="text-2xl font-bold text-white tracking-widest bg-black/20 px-6 py-2 rounded-full shadow-inner">
+                    <div className="text-xl md:text-2xl font-bold text-white tracking-widest bg-black/20 px-6 py-2 rounded-full shadow-inner">
                         {title}
                     </div>
                     <div className="flex items-center space-x-2 bg-yellow-400 px-4 py-2 rounded-full text-yellow-900 font-black shadow-md">
@@ -596,13 +658,31 @@
             };
 
             const renderSetup = () => (
-                <div className="flex flex-col items-center bg-white p-10 rounded-3xl shadow-2xl max-w-md w-full text-center relative">
-                    <CalendarIcon className="w-20 h-20 text-indigo-500 mb-6" />
-                    <h2 className="text-3xl font-black text-gray-800 mb-4">設定學習起點</h2>
-                    <p className="text-gray-500 font-medium mb-8">系統已為您內建教育部核心單字庫，請選擇一個日期，我們將為您自動安排學習計畫！</p>
+                <div className="flex flex-col items-center bg-white p-10 rounded-3xl shadow-2xl max-w-md w-full text-center relative mt-4">
+                    <CalendarIcon className="w-20 h-20 text-indigo-500 mb-4" />
+                    <h2 className="text-3xl font-black text-gray-800 mb-2">設定學習起點</h2>
+                    <p className="text-gray-500 font-medium mb-6">系統提供國小與國中雙版本題庫，紀錄將各自獨立儲存，請選擇您的挑戰！</p>
                     
+                    <div className="w-full text-left mb-6">
+                        <label className="block text-gray-700 font-bold mb-3 text-center">步驟一：選擇單字庫版本</label>
+                        <div className="flex w-full space-x-2">
+                            <button 
+                                onClick={() => handleLevelChange('elementary')}
+                                className={`flex-1 py-4 rounded-xl font-bold transition-all shadow-sm ${vocabLevel === 'elementary' ? 'bg-indigo-500 text-white shadow-md transform scale-105 border-2 border-indigo-600' : 'bg-gray-100 text-gray-500 hover:bg-gray-200 border-2 border-transparent'}`}
+                            >
+                                🎒 國小版<br/><span className="text-sm font-medium opacity-80">(1200字)</span>
+                            </button>
+                            <button 
+                                onClick={() => handleLevelChange('junior')}
+                                className={`flex-1 py-4 rounded-xl font-bold transition-all shadow-sm ${vocabLevel === 'junior' ? 'bg-indigo-500 text-white shadow-md transform scale-105 border-2 border-indigo-600' : 'bg-gray-100 text-gray-500 hover:bg-gray-200 border-2 border-transparent'}`}
+                            >
+                                🏫 國中版<br/><span className="text-sm font-medium opacity-80">(2000字)</span>
+                            </button>
+                        </div>
+                    </div>
+
                     <div className="w-full text-left mb-8">
-                        <label className="block text-gray-700 font-bold mb-3 text-center">選擇打卡開始日期</label>
+                        <label className="block text-gray-700 font-bold mb-3 text-center">步驟二：選擇打卡開始日期</label>
                         <input type="date" className="w-full border-4 border-indigo-100 rounded-2xl p-4 text-2xl font-bold text-gray-700 focus:border-indigo-400 focus:outline-none text-center"
                                onChange={(e) => setStartDate(e.target.value)} value={startDate || formatDate(new Date())} />
                     </div>
@@ -618,9 +698,6 @@
                 </div>
             );
 
-            // ==========================================
-            // 升級優化：30天固定打卡地圖，精確計算未來與過去時間
-            // ==========================================
             const renderCalendar = () => {
                 const todayStr = formatDate(new Date());
                 const todayObj = new Date(todayStr); 
@@ -629,7 +706,6 @@
                 const startObj = new Date(startDate);
                 startObj.setHours(0,0,0,0);
 
-                // 生成固定的 30 天打卡地圖
                 const daysArray = Array.from({ length: 30 }, (_, i) => {
                     const d = new Date(startObj);
                     d.setDate(d.getDate() + i);
@@ -643,13 +719,15 @@
                                 💾 備份與還原
                             </button>
                             <button onClick={() => setAppState('setup')} className="text-white text-sm bg-black/20 hover:bg-black/30 px-4 py-2 rounded-full transition-colors font-bold shadow-md">
-                                ⚙️ 更改日期
+                                ⚙️ 重新設定版本/日期
                             </button>
                         </div>
                         <div className="text-center space-y-4 mb-8">
-                            <h1 className="text-5xl font-extrabold text-white drop-shadow-lg tracking-wider">📅 30天學習挑戰地圖</h1>
+                            <h1 className="text-4xl md:text-5xl font-extrabold text-white drop-shadow-lg tracking-wider">📅 30天學習挑戰地圖</h1>
                             <p className="text-xl text-indigo-100 font-medium">每天完成 4 項測驗才算挑戰成功！</p>
-                            <p className="text-md text-indigo-200 font-medium bg-black/10 inline-block px-4 py-1 rounded-full">內建國小核心字彙總數：{globalVocab.length} 字</p>
+                            <p className="text-md text-indigo-200 font-medium bg-black/10 inline-block px-4 py-1 rounded-full border border-indigo-300">
+                                目前版本：{vocabLevel === 'junior' ? '🏫 國中進階' : '🎒 國小基礎'} ({globalVocab.length} 字)
+                            </p>
                         </div>
                         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 w-full">
                             {daysArray.map((dateStr) => {
@@ -666,7 +744,6 @@
                                 const isFullyCompleted = record['listening'] !== undefined && record['listening-en'] !== undefined && record['dictation'] !== undefined && record['speaking'] !== undefined;
                                 const totalDayScore = (record['listening'] || 0) + (record['listening-en'] || 0) + (record['dictation'] || 0) + (record['speaking'] || 0);
 
-                                // 判斷卡片底色與樣式
                                 let cardClass = "";
                                 if (isFullyCompleted) {
                                     cardClass = "bg-green-50 border-green-200 hover:bg-green-100";
@@ -735,7 +812,7 @@
                         <BookOpen className="w-8 h-8 text-indigo-500" />
                         <h2 className="text-3xl font-black text-gray-800">測驗前，先來聽聽發音與複習！</h2>
                     </div>
-                    <p className="text-lg text-gray-500 font-bold mb-6 bg-indigo-50 px-6 py-2 rounded-full">
+                    <p className="text-lg text-gray-500 font-bold mb-6 bg-indigo-50 px-6 py-2 rounded-full border border-indigo-200">
                         日期：{activeDateInfo?.date} {activeDateInfo?.isWeekend ? '(假日隨機 30 題總測驗)' : '(平日複習 20 題，隨機測 15 題)'}
                     </p>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full mb-8 max-h-[50vh] overflow-y-auto p-4 bg-gray-50 rounded-2xl border-2 border-gray-100">
@@ -790,7 +867,7 @@
                            </button>
                         </div>
                         <div className="text-center space-y-2 mb-4">
-                            <h2 className="text-4xl font-extrabold text-white drop-shadow-lg tracking-wider">完成四項測驗，解鎖今日打卡</h2>
+                            <h2 className="text-3xl md:text-4xl font-extrabold text-white drop-shadow-lg tracking-wider">完成四項測驗，解鎖今日打卡</h2>
                         </div>
                         {isAllDone && (
                             <div className="w-full max-w-4xl bg-yellow-400 rounded-3xl p-6 text-center shadow-xl mb-4 text-yellow-900 border-4 border-yellow-300 animate-bounce">
@@ -877,7 +954,6 @@
                     </button>
                     {!isRecording && !feedback && <p className="mt-8 text-gray-400 font-medium">點擊麥克風，念出上方的英文單字</p>}
 
-                    {/* 當發生系統限制無法錄音時，顯示寬容過關按鈕 */}
                     {speechError && !feedback && (
                         <button onClick={() => handleAnswer(true)} className="mt-6 bg-gray-500 text-white px-6 py-3 rounded-full font-bold shadow-md hover:bg-gray-600 transform active:scale-95 animate-pop">
                             設備無法錄音？點此略過此題 (直接算答對)
