@@ -376,10 +376,17 @@ const JUNIOR = ELEM; // 簡化展示，實際應用可替換為完整國中字�
 // ══════════════════════════════════════════════
 // 創新功能：魔法單字故事機 (StoryReader)
 // ══════════════════════════════════════════════
-function StoryReader({ wordsPool, onBack }) {
+function StoryReader({ wordsPool, onBack, setNotif }) {
   const [storyEn, setStoryEn] = useState('');
   const [storyZh, setStoryZh] = useState('');
   const [isPlaying, setIsPlaying] = useState(false);
+  const [speechRate, setSpeechRate] = useState(0.85); // 語速狀態
+  const [isRec, setIsRec] = useState(false); // 錄音狀態
+  const [rtText, setRtText] = useState(''); // 口說內容
+  const [speakScore, setSpeakScore] = useState(null); // 口說分數
+  
+  const recRef = useRef(null);
+  const tmRef = useRef(null);
 
   useEffect(() => {
     const shuffle=(a)=>{const r=[...a];for(let i=r.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[r[i],r[j]]=[r[j],r[i]];}return r;};
@@ -394,6 +401,7 @@ function StoryReader({ wordsPool, onBack }) {
     setStoryZh(zh);
   }, [wordsPool]);
 
+  // 朗讀功能
   const toggleSpeak = () => {
     if(!('speechSynthesis' in window)) return alert('不支援語音功能');
     if(isPlaying) {
@@ -403,34 +411,129 @@ function StoryReader({ wordsPool, onBack }) {
       window.speechSynthesis.cancel();
       const u = new SpeechSynthesisUtterance(storyEn);
       u.lang = 'en-US';
-      u.rate = 0.85;
+      u.rate = speechRate; // 套用語速
       u.onend = () => setIsPlaying(false);
       setIsPlaying(true);
       window.speechSynthesis.speak(u);
     }
   };
 
-  useEffect(()=>{ return ()=>window.speechSynthesis.cancel(); },[]);
+  // 練習口說功能
+  const handlePracticeSpeak = () => {
+    if(isRec){
+      if(recRef.current) recRef.current.stop();
+      setIsRec(false);
+      return;
+    }
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if(!SR) { setNotif('❌ 瀏覽器不支援語音輸入！'); return; }
+    
+    const r = new SR();
+    recRef.current = r;
+    r.lang = 'en-US';
+    r.interimResults = true;
+    r.continuous = true;
+    let done = false;
+    
+    setRtText('🎙️ 聆聽中... (請試著唸出上方的英文故事！)'); 
+    setSpeakScore(null);
+    
+    r.onstart = () => {
+      setIsRec(true);
+      // 給予 20 秒鐘的時間朗讀
+      tmRef.current = setTimeout(() => {
+        if(!done){ done=true; r.stop(); setIsRec(false); }
+      }, 20000);
+    };
+    
+    r.onresult = (ev) => {
+      if(done) return;
+      let lt = '';
+      for(let i=0; i<ev.results.length; i++){
+        lt += ev.results[i][0].transcript + ' ';
+      }
+      setRtText(lt);
+    };
+    
+    r.onerror = () => { if(!done){ done=true; r.stop(); setIsRec(false); } };
+    
+    r.onend = () => {
+      if(!done){ done=true; }
+      setIsRec(false);
+      
+      // 若沒有錄到任何字則直接返回
+      if(rtText === '🎙️ 聆聽中... (請試著唸出上方的英文故事！)' || !rtText.trim()) {
+         setRtText('');
+         return;
+      }
+      
+      // 計算口說分數 (簡單字彙比對)
+      const spokenWords = rtText.toLowerCase().replace(/[^a-z0-9 ]/g, '').split(/\s+/).filter(Boolean);
+      const storyWords = storyEn.toLowerCase().replace(/[^a-z0-9 ]/g, '').split(/\s+/).filter(Boolean);
+      let matchCount = 0;
+      storyWords.forEach(w => { if(spokenWords.includes(w)) matchCount++; });
+      
+      // 寬鬆的計分公式 (讀對一部份字彙就有高分)
+      const score = Math.min(100, Math.round((matchCount / storyWords.length) * 100 * 1.5));
+      setSpeakScore(score);
+    };
+    
+    try { r.start(); } catch(e) { setIsRec(false); }
+  };
+
+  // 清除事件
+  useEffect(()=>{ 
+    return () => { 
+      window.speechSynthesis.cancel(); 
+      if(recRef.current) recRef.current.stop();
+      if(tmRef.current) clearTimeout(tmRef.current);
+    }; 
+  },[]);
 
   return (
-    <div className="kawaii-card animate-slide-up" style={{padding:32, width:'100%', maxWidth:600, textAlign:'center'}}>
+    <div className="kawaii-card animate-slide-up" style={{padding:32, width:'100%', maxWidth:680, textAlign:'center'}}>
       <h2 style={{fontSize:'1.8rem', fontWeight:900, color:'var(--kuromi-dark)', marginBottom:16}}>📖 魔法小故事</h2>
       <p style={{color:'#666', fontWeight:700, marginBottom:20}}>我們把今天的單字變成故事囉！</p>
       
+      {/* 英文與中文故事區 */}
       <div style={{background: 'linear-gradient(135deg, #e1bee7, #f8bbd0)', borderRadius:20, padding:24, marginBottom:20, boxShadow:'0 4px 15px rgba(225,190,231,0.5)', position:'relative'}}>
         <div style={{position:'absolute', top:-20, right:-10, transform:'scale(0.6)'}}>{Characters.twilight(100)}</div>
         <p style={{fontSize:'1.1rem', fontWeight:800, color:'#3a1c4a', lineHeight:1.6, textAlign:'left', marginBottom:16}}>{storyEn}</p>
         <p style={{fontSize:'1rem', fontWeight:700, color:'#5c2b4a', lineHeight:1.5, textAlign:'left', borderTop:'2px dashed rgba(255,255,255,0.5)', paddingTop:12}}>{storyZh}</p>
       </div>
 
-      <div style={{display:'flex', gap:16, justifyContent:'center'}}>
-        <button className="candy-btn" onClick={toggleSpeak} style={{padding:'12px 24px', background:isPlaying?'#f44336':'#81d4fa', color:isPlaying?'#fff':'#111', fontSize:'1rem'}}>
+      {/* 語速調整控制條 */}
+      <div style={{marginBottom: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12}}>
+        <span style={{fontWeight: 800, color: '#8e78a6'}}>朗讀速度:</span>
+        <input type="range" min="0.4" max="1.2" step="0.1" value={speechRate} onChange={e=>setSpeechRate(parseFloat(e.target.value))} style={{cursor:'pointer'}} />
+        <span style={{fontWeight: 900, color: '#f48fb1'}}>{speechRate}x</span>
+      </div>
+
+      {/* 控制按鈕區 */}
+      <div style={{display:'flex', gap:12, justifyContent:'center', flexWrap:'wrap'}}>
+        <button className="candy-btn" onClick={toggleSpeak} style={{padding:'10px 20px', background:isPlaying?'#f44336':'#81d4fa', color:isPlaying?'#fff':'#111', fontSize:'1rem'}}>
           {isPlaying ? '⏹️ 停止朗讀' : '🔊 英文朗讀'}
         </button>
-        <button className="candy-btn" onClick={onBack} style={{padding:'12px 24px', background:'#2d2b36', color:'#fff', fontSize:'1rem'}}>
+        <button className="candy-btn" onClick={handlePracticeSpeak} style={{padding:'10px 20px', background:isRec?'#f44336':'#c8e6c9', color:isRec?'#fff':'#2e7d32', fontSize:'1rem'}}>
+          {isRec ? '⏹️ 停止收音' : '🎤 換我唸唸看'}
+        </button>
+        <button className="candy-btn" onClick={onBack} style={{padding:'10px 20px', background:'#2d2b36', color:'#fff', fontSize:'1rem'}}>
           返回選單
         </button>
       </div>
+
+      {/* 口說練習回饋區 */}
+      {(rtText || speakScore !== null) && (
+        <div className="animate-slide-up" style={{background: '#fdfbfd', border: '2px dashed #e1bee7', borderRadius: 16, padding: '16px', marginTop: '20px'}}>
+          <p style={{fontSize:'0.9rem', color:'#8e78a6', fontWeight: 800, margin: '0 0 8px 0'}}>你的發音內容：</p>
+          <p style={{fontSize:'1.05rem', color:'#3a1c4a', fontWeight: 900, margin: '0 0 12px 0', minHeight: 24}}>{rtText}</p>
+          {speakScore !== null && (
+            <div className="animate-bounce-in" style={{background: speakScore > 60 ? '#c8e6c9' : '#fff9c4', color: speakScore > 60 ? '#2e7d32' : '#f57f17', padding: '8px 16px', borderRadius: 99, fontWeight: 900, display: 'inline-block'}}>
+              魔法評分：{speakScore} 分 {speakScore > 60 ? '✨ 太棒了！' : '💪 再試一次！'}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
@@ -707,19 +810,20 @@ function App(){
     );
   };
 
-  // REVIEW
+  // REVIEW - 1. 加大單字複習窗格
   const rReview=()=>(
     <div className="kawaii-card animate-slide-up" style={{padding:28,width:'100%',maxWidth:800}}>
       <button onClick={()=>setSt('calendar')} style={{background:'none',border:'none',color:'#8e78a6',fontWeight:900,cursor:'pointer',marginBottom:16}}>← 返回地圖</button>
       <div style={{textAlign:'center',marginBottom:20}}>
-        <div className="animate-float">{Characters.melody(80)}</div>
+        <div className="animate-float" style={{marginBottom:12}}>{Characters.melody(80)}</div>
         <h2 style={{fontSize:'1.8rem',fontWeight:900,color:'#2d2b36'}}>先複習魔法單字！</h2>
       </div>
-      <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(160px,1fr))',gap:10,maxHeight:'40vh',overflowY:'auto',padding:8,background:'#f3e5f5',borderRadius:20,marginBottom:20}}>
+      {/* 修改了 maxHeight 讓可視區域變長 */}
+      <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(160px,1fr))',gap:10,maxHeight:'65vh',overflowY:'auto',padding:8,background:'#f3e5f5',borderRadius:20,marginBottom:20}}>
         {wordsPool.map((w,i)=>(
-          <div key={i} style={{background:'white',borderRadius:16,padding:'12px',display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+          <div key={i} style={{background:'white',borderRadius:16,padding:'12px',display:'flex',justifyContent:'space-between',alignItems:'center',boxShadow:'0 2px 4px rgba(0,0,0,0.05)'}}>
             <div><div style={{fontWeight:900,color:'#2d2b36'}}>{w.en}</div><div style={{color:'#888',fontSize:'0.85rem'}}>{w.zh}</div></div>
-            <button onClick={()=>speakW(w.en)} style={{background:'#e1bee7',borderRadius:12,padding:'8px',border:'none',color:'#4a1c40'}}>🔊</button>
+            <button onClick={()=>speakW(w.en)} style={{background:'#e1bee7',borderRadius:12,padding:'8px',border:'none',color:'#4a1c40',cursor:'pointer'}}>🔊</button>
           </div>
         ))}
       </div>
@@ -727,7 +831,7 @@ function App(){
     </div>
   );
 
-  // MENU
+  // MENU - 2. 縮小整體選單比例
   const rMenu=()=>{
     const r=activeDI?(records[activeDI.date]||{}):{};
     const modeInfo=[
@@ -738,29 +842,30 @@ function App(){
       {k:'sentence',icon:'📚',title:'語感之泉',desc:'句型文法',bg:'#e1bee7',tc:'#4a1c40',c:Characters.melody},
     ];
     return(
-      <div style={{width:'100%',maxWidth:800}}>
+      <div style={{width:'100%',maxWidth:700}}> {/* 縮小最大寬度 */}
         <button onClick={()=>setSt('review')} style={{background:'#2d2b36',border:'none',borderRadius:99,padding:'8px 20px',color:'white',fontWeight:800,marginBottom:16}}>← 複習單字</button>
-        <div style={{textAlign:'center',marginBottom:24}}><h2 style={{fontSize:'2rem',fontWeight:900,color:'#2d2b36'}}>選擇你的試煉</h2></div>
+        <div style={{textAlign:'center',marginBottom:20}}><h2 style={{fontSize:'1.8rem',fontWeight:900,color:'#2d2b36'}}>選擇你的試煉</h2></div>
         
         {/* 單字故事機入口 */}
-        <div style={{background:'linear-gradient(90deg, #b3e5fc, #e1bee7, #f8bbd0)', borderRadius:24, padding:'20px', marginBottom:20, display:'flex', justifyContent:'space-between', alignItems:'center', boxShadow:'0 6px 15px rgba(225,190,231,0.5)'}}>
+        <div style={{background:'linear-gradient(90deg, #b3e5fc, #e1bee7, #f8bbd0)', borderRadius:20, padding:'16px 20px', marginBottom:20, display:'flex', justifyContent:'space-between', alignItems:'center', boxShadow:'0 6px 15px rgba(225,190,231,0.5)'}}>
           <div style={{textAlign:'left'}}>
-            <h3 style={{margin:0, color:'#3a1c4a', fontWeight:900, fontSize:'1.4rem'}}>📖 魔法故事時間</h3>
-            <p style={{margin:0, color:'#5c2b4a', fontWeight:700, fontSize:'0.9rem'}}>用今天的單字聽故事吧！</p>
+            <h3 style={{margin:0, color:'#3a1c4a', fontWeight:900, fontSize:'1.2rem'}}>📖 魔法故事時間</h3>
+            <p style={{margin:0, color:'#5c2b4a', fontWeight:700, fontSize:'0.85rem'}}>用今天的單字聽故事吧！</p>
           </div>
-          <button className="candy-btn" onClick={()=>setSt('story')} style={{padding:'12px 24px', background:'#fff', color:'#3a1c4a', fontSize:'1rem'}}>進入故事 →</button>
+          <button className="candy-btn" onClick={()=>setSt('story')} style={{padding:'10px 20px', background:'#fff', color:'#3a1c4a', fontSize:'0.9rem'}}>進入故事 →</button>
         </div>
 
-        <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(200px,1fr))',gap:16}}>
+        {/* 調整按鈕 Grid 佈局並縮小比例 */}
+        <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(140px,1fr))',gap:12}}>
           {modeInfo.map(({k,icon,title,desc,bg,tc,c:CC})=>{
             const done=getRec(r,k)!==null;
             return(
-              <button key={k} onClick={()=>startGame(k)} className="candy-btn" style={{background:bg,color:tc,padding:'20px',textAlign:'center',border:`4px solid ${done?'#fff':'transparent'}`,opacity:done?0.8:1}}>
-                {done&&<div style={{position:'absolute',top:8,right:8,background:'#fff',color:tc,borderRadius:99,padding:'4px 8px',fontSize:'0.7rem'}}>已完成</div>}
-                <div className="animate-float" style={{marginBottom:8}}><CC size={60}/></div>
-                <div style={{fontSize:'1.4rem'}}>{icon}</div>
-                <div style={{fontWeight:900,fontSize:'1.1rem'}}>{title}</div>
-                <div style={{fontSize:'0.8rem',opacity:0.8}}>{desc}</div>
+              <button key={k} onClick={()=>startGame(k)} className="candy-btn" style={{background:bg,color:tc,padding:'14px',textAlign:'center',border:`3px solid ${done?'#fff':'transparent'}`,opacity:done?0.8:1}}>
+                {done&&<div style={{position:'absolute',top:8,right:8,background:'#fff',color:tc,borderRadius:99,padding:'2px 8px',fontSize:'0.65rem',fontWeight:800}}>已完成</div>}
+                <div className="animate-float" style={{marginBottom:4}}><CC size={45}/></div> {/* 縮小 icon size */}
+                <div style={{fontSize:'1.2rem'}}>{icon}</div>
+                <div style={{fontWeight:900,fontSize:'1rem',marginTop:4}}>{title}</div>
+                <div style={{fontSize:'0.75rem',opacity:0.8}}>{desc}</div>
               </button>
             );
           })}
@@ -894,7 +999,8 @@ function App(){
         {st==='calendar'&&rCal()}
         {st==='review'&&rReview()}
         {st==='menu'&&rMenu()}
-        {st==='story'&&<StoryReader wordsPool={wordsPool} onBack={()=>setSt('menu')}/>}
+        {/* 將 setNotif 傳遞給 StoryReader 以啟用報錯提示 */}
+        {st==='story'&&<StoryReader wordsPool={wordsPool} onBack={()=>setSt('menu')} setNotif={setNotif}/>}
         {st==='listening'&&rListening()}
         {(st==='dictation'||st==='dictation-en')&&rDict()}
         {st==='speaking'&&rSpeaking()}
