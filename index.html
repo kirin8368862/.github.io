@@ -64,11 +64,48 @@ html,body{height:100%;height:100dvh;overflow:hidden;background:#fdfbfd;}
 <script type="text/babel">
 const {useState,useEffect,useRef,useCallback,useMemo}=React;
 
-/* ══════════ STORAGE API ══════════ */
+/* ══════════ STORAGE API（修正版：加重試＋寫入驗證）══════════
+   問題根源：window.storage 在 key 不存在時會 throw，
+   原本 catch 直接 return null 導致登入時誤判「帳號不存在」。
+   修正：
+   1. get() 加重試（最多3次，間隔遞增）
+   2. set() 寫入後立即讀回驗證，失敗則重試
+   3. handleAuth 登入時額外等待 300ms 後再讀一次，
+      避免剛寫入就讀取的 race condition
+══════════ */
 const ST={
-  async get(key){try{const r=await window.storage.get(key);return r?JSON.parse(r.value):null;}catch(e){return null;}},
-  async set(key,val){try{await window.storage.set(key,JSON.stringify(val));return true;}catch(e){return false;}},
-  async del(key){try{await window.storage.delete(key);return true;}catch(e){return false;}},
+  async get(key, retries=3){
+    for(let i=0;i<retries;i++){
+      try{
+        const r=await window.storage.get(key);
+        if(r && r.value!==undefined && r.value!==null){
+          return JSON.parse(r.value);
+        }
+        return null;
+      }catch(e){
+        if(i===retries-1) return null;
+        await new Promise(res=>setTimeout(res, 160*(i+1)));
+      }
+    }
+    return null;
+  },
+  async set(key, val, retries=3){
+    const data=JSON.stringify(val);
+    for(let i=0;i<retries;i++){
+      try{
+        await window.storage.set(key, data);
+        // 驗證寫入成功
+        const v=await window.storage.get(key);
+        if(v && v.value===data) return true;
+      }catch(e){}
+      await new Promise(res=>setTimeout(res, 160*(i+1)));
+    }
+    console.warn('[ST] 寫入失敗 key:', key);
+    return false;
+  },
+  async del(key){
+    try{await window.storage.delete(key);return true;}catch(e){return false;}
+  },
 };
 
 /* ══════════ 音效 ══════════ */
@@ -108,176 +145,117 @@ const isFuzzy=(spoken,target)=>{
   return cs.replace(/\s/g,'').includes(ct);
 };
 
-/* ══════════ 精緻角色 SVG（依參考圖重繪）══════════ */
+/* ══════════ 精緻角色 SVG ══════════ */
 const Chars={
-
-  /* 酷洛米 - 黑色小惡魔兔，白臉，耳朵有粉裡，頂骷髏 */
   kuromi:(z=100)=>(
     <svg width={z} height={z} viewBox="0 0 120 130">
-      {/* 黑耳 */}
       <ellipse cx="36" cy="20" rx="13" ry="30" fill="#1a1a1a" transform="rotate(-10,36,20)"/>
       <ellipse cx="36" cy="20" rx="8" ry="22" fill="#f48fb1" transform="rotate(-10,36,20)"/>
       <ellipse cx="84" cy="20" rx="13" ry="30" fill="#1a1a1a" transform="rotate(10,84,20)"/>
       <ellipse cx="84" cy="20" rx="8" ry="22" fill="#f48fb1" transform="rotate(10,84,20)"/>
-      {/* 頭（黑色） */}
       <ellipse cx="60" cy="62" rx="38" ry="36" fill="#1a1a1a"/>
-      {/* 白臉圓 */}
       <ellipse cx="60" cy="67" rx="30" ry="26" fill="#f5f5f5"/>
-      {/* 眼睛（細長憤怒眉） */}
       <ellipse cx="44" cy="61" rx="7" ry="8" fill="#1a1a1a"/>
       <ellipse cx="76" cy="61" rx="7" ry="8" fill="#1a1a1a"/>
       <circle cx="46" cy="58" r="2.2" fill="white"/>
       <circle cx="78" cy="58" r="2.2" fill="white"/>
-      {/* 憤怒眉 */}
       <path d="M36,53 Q44,49 50,53" fill="none" stroke="#1a1a1a" strokeWidth="2.5" strokeLinecap="round"/>
       <path d="M70,53 Q76,49 84,53" fill="none" stroke="#1a1a1a" strokeWidth="2.5" strokeLinecap="round"/>
-      {/* 鼻子 */}
       <ellipse cx="60" cy="70" rx="3.5" ry="2.5" fill="#f48fb1"/>
-      {/* 嘴（小壞笑） */}
       <path d="M51,75 Q60,82 69,75" fill="none" stroke="#1a1a1a" strokeWidth="2" strokeLinecap="round"/>
-      {/* 腮紅 */}
       <ellipse cx="38" cy="72" rx="8" ry="5" fill="#f48fb1" opacity="0.45"/>
       <ellipse cx="82" cy="72" rx="8" ry="5" fill="#f48fb1" opacity="0.45"/>
-      {/* 骷髏頭裝飾（頭頂） */}
       <circle cx="60" cy="36" r="9" fill="white" stroke="#1a1a1a" strokeWidth="1.5"/>
       <circle cx="56" cy="34" r="2.5" fill="#1a1a1a"/>
       <circle cx="64" cy="34" r="2.5" fill="#1a1a1a"/>
       <path d="M55,39 Q60,41.5 65,39" stroke="#1a1a1a" strokeWidth="1.2" fill="none" strokeLinecap="round"/>
       <ellipse cx="60" cy="42" rx="5" ry="3" fill="white" stroke="#1a1a1a" strokeWidth="1.2"/>
-      {/* 身體 */}
       <ellipse cx="60" cy="104" rx="28" ry="18" fill="#1a1a1a"/>
-      {/* 圍領 */}
       <path d="M32,96 Q60,108 88,96" fill="white" stroke="#1a1a1a" strokeWidth="1"/>
     </svg>
   ),
-
-  /* 大耳狗 Cinnamoroll - 白色胖圓，超大藍垂耳，藍眼 */
   cinnamoroll:(z=100)=>(
     <svg width={z} height={z} viewBox="0 0 120 130">
-      {/* 超大垂耳（像狗耳垂下） */}
       <ellipse cx="18" cy="56" rx="17" ry="38" fill="#e8f4fd" stroke="#b3d8f0" strokeWidth="1.5"/>
       <ellipse cx="102" cy="56" rx="17" ry="38" fill="#e8f4fd" stroke="#b3d8f0" strokeWidth="1.5"/>
-      {/* 身體 */}
       <ellipse cx="60" cy="108" rx="24" ry="14" fill="white"/>
-      {/* 捲尾 */}
       <path d="M82,108 Q95,100 90,112 Q86,118 80,112Z" fill="white" stroke="#ddd" strokeWidth="1"/>
-      {/* 大圓頭 */}
       <circle cx="60" cy="66" r="43" fill="white"/>
-      {/* 藍眼睛（橢圓大眼） */}
       <ellipse cx="43" cy="62" rx="7.5" ry="9" fill="#3a95d8"/>
       <ellipse cx="77" cy="62" rx="7.5" ry="9" fill="#3a95d8"/>
       <circle cx="45.5" cy="59.5" r="3" fill="white"/>
       <circle cx="79.5" cy="59.5" r="3" fill="white"/>
       <circle cx="44" cy="65" r="1.5" fill="white" opacity="0.5"/>
       <circle cx="78" cy="65" r="1.5" fill="white" opacity="0.5"/>
-      {/* 小鼻子 */}
       <ellipse cx="60" cy="73" rx="4.5" ry="3" fill="#c8dff0"/>
-      {/* 嘴 */}
       <path d="M52,78 Q60,87 68,78" fill="none" stroke="#9dc5e0" strokeWidth="2.5" strokeLinecap="round"/>
-      {/* 腮紅 */}
       <ellipse cx="37" cy="73" rx="9" ry="6" fill="#fce4ec" opacity="0.85"/>
       <ellipse cx="83" cy="73" rx="9" ry="6" fill="#fce4ec" opacity="0.85"/>
-      {/* 頭頂捲毛 */}
       <path d="M55,24 Q60,16 65,24" fill="none" stroke="#ddd" strokeWidth="3" strokeLinecap="round"/>
-      {/* 肚子圓點 */}
       <circle cx="60" cy="98" r="7" fill="#e8f4fd"/>
     </svg>
   ),
-
-  /* 布丁狗 Pompompurin - 黃色胖狗，深棕貝雷帽，U型眼 */
   pompompurin:(z=100)=>(
     <svg width={z} height={z} viewBox="0 0 120 130">
-      {/* 身體 */}
       <ellipse cx="60" cy="105" rx="32" ry="20" fill="#fce97a"/>
-      {/* 大耳朵（下垂） */}
       <ellipse cx="22" cy="65" rx="16" ry="22" fill="#fce97a" stroke="#d4a800" strokeWidth="1"/>
       <ellipse cx="98" cy="65" rx="16" ry="22" fill="#fce97a" stroke="#d4a800" strokeWidth="1"/>
-      {/* 頭部 */}
       <circle cx="60" cy="68" r="40" fill="#fce97a"/>
-      {/* 深棕色貝雷帽 */}
       <ellipse cx="60" cy="38" rx="40" ry="14" fill="#5c2e05"/>
       <ellipse cx="60" cy="30" rx="28" ry="16" fill="#6b3508"/>
       <ellipse cx="60" cy="28" rx="29" ry="10" fill="#7a3e0a"/>
-      {/* 帽頂小圓扣 */}
       <circle cx="60" cy="20" r="5" fill="#5c2e05"/>
-      {/* U形眼 */}
       <path d="M38,65 Q43,73 48,65" fill="none" stroke="#5c2e05" strokeWidth="3.5" strokeLinecap="round"/>
       <path d="M72,65 Q77,73 82,65" fill="none" stroke="#5c2e05" strokeWidth="3.5" strokeLinecap="round"/>
-      {/* 鼻子 */}
       <ellipse cx="60" cy="76" rx="5" ry="3.5" fill="#8b5e2b"/>
-      {/* 嘴 */}
       <path d="M52,82 Q60,88 68,82" fill="none" stroke="#8b5e2b" strokeWidth="2" strokeLinecap="round"/>
-      {/* 腮紅 */}
       <ellipse cx="36" cy="77" rx="10" ry="6" fill="#fcd5a0" opacity="0.9"/>
       <ellipse cx="84" cy="77" rx="10" ry="6" fill="#fcd5a0" opacity="0.9"/>
     </svg>
   ),
-
-  /* 美樂蒂 - 白兔，粉紅帽，水藍蝴蝶結 */
   melody:(z=100)=>(
     <svg width={z} height={z} viewBox="0 0 120 130">
-      {/* 身體 */}
       <ellipse cx="60" cy="106" rx="26" ry="17" fill="#fff0f5"/>
-      {/* 粉耳 */}
       <ellipse cx="34" cy="18" rx="11" ry="26" fill="#f48fb1"/>
       <ellipse cx="34" cy="18" rx="7" ry="19" fill="#ffd6e7"/>
       <ellipse cx="86" cy="18" rx="11" ry="26" fill="#f48fb1"/>
       <ellipse cx="86" cy="18" rx="7" ry="19" fill="#ffd6e7"/>
-      {/* 粉帽（覆蓋耳根） */}
       <ellipse cx="60" cy="42" rx="40" ry="18" fill="#f48fb1"/>
       <ellipse cx="60" cy="50" rx="43" ry="10" fill="#e91e8c"/>
-      {/* 頭部 */}
       <ellipse cx="60" cy="76" rx="36" ry="32" fill="white"/>
-      {/* 水藍蝴蝶結（大） */}
       <ellipse cx="46" cy="53" rx="12" ry="7.5" fill="#90caf9" transform="rotate(-18,46,53)"/>
       <ellipse cx="68" cy="49" rx="12" ry="7.5" fill="#90caf9" transform="rotate(18,68,49)"/>
       <circle cx="57" cy="51" r="5.5" fill="#bbdefb"/>
-      {/* 圓點紋 */}
       <circle cx="42" cy="52" r="2" fill="white" opacity="0.7"/>
       <circle cx="50" cy="47" r="2" fill="white" opacity="0.7"/>
       <circle cx="64" cy="44" r="2" fill="white" opacity="0.7"/>
       <circle cx="72" cy="53" r="2" fill="white" opacity="0.7"/>
-      {/* 眼睛 */}
       <ellipse cx="44" cy="72" rx="6.5" ry="7.5" fill="#3e2514"/>
       <ellipse cx="76" cy="72" rx="6.5" ry="7.5" fill="#3e2514"/>
       <circle cx="45.5" cy="69.5" r="2.2" fill="white"/>
       <circle cx="77.5" cy="69.5" r="2.2" fill="white"/>
-      {/* 鼻子 */}
       <ellipse cx="60" cy="80" rx="3.5" ry="2.5" fill="#ffcc02"/>
-      {/* 嘴 */}
       <path d="M52,85 Q60,92 68,85" fill="none" stroke="#e91e8c" strokeWidth="2.2" strokeLinecap="round"/>
-      {/* 腮紅 */}
       <ellipse cx="38" cy="80" rx="9" ry="5.5" fill="#f8bbd0" opacity="0.75"/>
       <ellipse cx="82" cy="80" rx="9" ry="5.5" fill="#f8bbd0" opacity="0.75"/>
     </svg>
   ),
-
-  /* 帕洽狗 Pochacco - 白色圓頭小狗，黑大耳 */
   pochacco:(z=100)=>(
     <svg width={z} height={z} viewBox="0 0 120 130">
-      {/* 身體 */}
       <ellipse cx="60" cy="105" rx="28" ry="18" fill="#f5f5f5"/>
-      {/* 黑耳 */}
       <ellipse cx="28" cy="42" rx="17" ry="22" fill="#212121" transform="rotate(-15,28,42)"/>
       <ellipse cx="92" cy="42" rx="17" ry="22" fill="#212121" transform="rotate(15,92,42)"/>
-      {/* 耳朵內白 */}
       <ellipse cx="29" cy="40" rx="10" ry="15" fill="#f5f5f5" transform="rotate(-15,29,40)"/>
       <ellipse cx="91" cy="40" rx="10" ry="15" fill="#f5f5f5" transform="rotate(15,91,40)"/>
-      {/* 頭 */}
       <circle cx="60" cy="70" r="40" fill="#f5f5f5"/>
-      {/* 眼睛（黑色大圓） */}
       <circle cx="44" cy="66" r="7.5" fill="#212121"/>
       <circle cx="76" cy="66" r="7.5" fill="#212121"/>
       <circle cx="46" cy="63.5" r="2.8" fill="white"/>
       <circle cx="78" cy="63.5" r="2.8" fill="white"/>
-      {/* 黑鼻子 */}
       <ellipse cx="60" cy="76" rx="5.5" ry="3.5" fill="#212121"/>
-      {/* 嘴 */}
       <path d="M54,81 Q60,87 66,81" fill="none" stroke="#212121" strokeWidth="2" strokeLinecap="round"/>
-      {/* 腮紅 */}
       <ellipse cx="38" cy="76" rx="8" ry="5" fill="#ffccbc" opacity="0.85"/>
       <ellipse cx="82" cy="76" rx="8" ry="5" fill="#ffccbc" opacity="0.85"/>
-      {/* 小花（頭頂） */}
       <circle cx="60" cy="30" r="5" fill="#f48fb1"/>
       <circle cx="52" cy="28" r="4" fill="#f48fb1"/>
       <circle cx="68" cy="28" r="4" fill="#f48fb1"/>
@@ -286,48 +264,34 @@ const Chars={
       <circle cx="60" cy="30" r="3" fill="#fff"/>
     </svg>
   ),
-
-  /* 彩虹小馬 Rainbow Dash - 藍馬，彩虹鬃，翅膀，桃形眼 */
   rainbow:(z=100)=>(
     <svg width={z} height={z} viewBox="0 0 120 130">
-      {/* 翅膀 */}
       <path d="M12,62 Q4,40 28,36 Q42,33 40,60Z" fill="#b3e5fc" stroke="#81d4fa" strokeWidth="1.5"/>
       <path d="M108,62 Q116,40 92,36 Q78,33 80,60Z" fill="#b3e5fc" stroke="#81d4fa" strokeWidth="1.5"/>
-      {/* 翅膀羽毛 */}
       <path d="M18,57 Q26,45 37,54" fill="none" stroke="#81d4fa" strokeWidth="1.5"/>
       <path d="M22,63 Q30,55 38,59" fill="none" stroke="#81d4fa" strokeWidth="1.2"/>
       <path d="M102,57 Q94,45 83,54" fill="none" stroke="#81d4fa" strokeWidth="1.5"/>
-      {/* 身體 */}
       <ellipse cx="60" cy="100" rx="32" ry="22" fill="#29b6f6"/>
-      {/* 彩虹鬃毛 */}
       <path d="M24,50 Q32,18 60,16 Q88,18 96,52" fill="none" stroke="#e53935" strokeWidth="8" strokeLinecap="round"/>
       <path d="M26,53 Q34,22 60,20 Q86,22 94,55" fill="none" stroke="#ff9800" strokeWidth="6" strokeLinecap="round"/>
       <path d="M28,56 Q36,26 60,24 Q84,26 92,58" fill="none" stroke="#ffeb3b" strokeWidth="4.5" strokeLinecap="round"/>
       <path d="M30,59 Q38,30 60,28 Q82,30 90,61" fill="none" stroke="#4caf50" strokeWidth="3.5" strokeLinecap="round"/>
       <path d="M32,61 Q40,33 60,31 Q80,33 88,63" fill="none" stroke="#2196f3" strokeWidth="3" strokeLinecap="round"/>
       <path d="M34,63 Q42,36 60,34 Q78,36 86,65" fill="none" stroke="#9c27b0" strokeWidth="2.5" strokeLinecap="round"/>
-      {/* 頭 */}
       <ellipse cx="60" cy="66" rx="34" ry="30" fill="#29b6f6"/>
-      {/* 桃形眼 */}
       <ellipse cx="43" cy="62" rx="9.5" ry="11.5" fill="white"/>
       <ellipse cx="77" cy="62" rx="9.5" ry="11.5" fill="white"/>
       <ellipse cx="43" cy="63" rx="6.5" ry="8.5" fill="#e91e63"/>
       <ellipse cx="77" cy="63" rx="6.5" ry="8.5" fill="#e91e63"/>
       <circle cx="44.5" cy="60" r="2.8" fill="white"/>
       <circle cx="78.5" cy="60" r="2.8" fill="white"/>
-      {/* 鼻子 */}
       <ellipse cx="60" cy="76" rx="4.5" ry="3" fill="#0288d1"/>
-      {/* 嘴 */}
       <path d="M52,82 Q60,89 68,82" fill="none" stroke="#0288d1" strokeWidth="2.2" strokeLinecap="round"/>
     </svg>
   ),
-
-  /* 派對蹦蹦 Pinkie Pie - 粉馬，超爆炸捲髮，圓眼 */
   pinkie:(z=100)=>(
     <svg width={z} height={z} viewBox="0 0 120 130">
-      {/* 身體 */}
       <ellipse cx="60" cy="102" rx="30" ry="22" fill="#f48fb1"/>
-      {/* 爆炸捲髮（大量圓） */}
       <circle cx="36" cy="30" r="15" fill="#e91e63"/>
       <circle cx="56" cy="18" r="17" fill="#e91e63"/>
       <circle cx="76" cy="22" r="15" fill="#e91e63"/>
@@ -337,62 +301,45 @@ const Chars={
       <circle cx="22" cy="60" r="12" fill="#e91e63"/>
       <circle cx="42" cy="58" r="11" fill="#f06292"/>
       <circle cx="72" cy="56" r="11" fill="#f06292"/>
-      {/* 頭部 */}
       <ellipse cx="60" cy="70" rx="34" ry="30" fill="#f48fb1"/>
-      {/* 眼睛 */}
       <ellipse cx="44" cy="65" rx="9.5" ry="11.5" fill="white"/>
       <ellipse cx="76" cy="65" rx="9.5" ry="11.5" fill="white"/>
       <ellipse cx="44" cy="66" rx="6.5" ry="8.5" fill="#29b6f6"/>
       <ellipse cx="76" cy="66" rx="6.5" ry="8.5" fill="#29b6f6"/>
       <circle cx="45.5" cy="63" r="2.8" fill="white"/>
       <circle cx="77.5" cy="63" r="2.8" fill="white"/>
-      {/* 鼻子+嘴 */}
       <ellipse cx="60" cy="76" rx="4.5" ry="3" fill="#c2185b"/>
       <path d="M50,82 Q60,91 70,82" fill="none" stroke="#c2185b" strokeWidth="2.5" strokeLinecap="round"/>
-      {/* 腮紅 */}
       <ellipse cx="36" cy="76" rx="9.5" ry="6" fill="#f8bbd0" opacity="0.85"/>
       <ellipse cx="84" cy="76" rx="9.5" ry="6" fill="#f8bbd0" opacity="0.85"/>
-      {/* 氣球 */}
       <circle cx="92" cy="105" r="5.5" fill="#ff9800" opacity="0.9"/>
       <circle cx="100" cy="97" r="5.5" fill="#f44336" opacity="0.9"/>
       <circle cx="97" cy="89" r="4.5" fill="#ffeb3b" opacity="0.9"/>
       <path d="M92,110.5 Q96,118 94,122" stroke="#aaa" strokeWidth="1" fill="none"/>
     </svg>
   ),
-
-  /* 暮光閃閃 Twilight Sparkle - 紫馬，獨角，紫藍紅鬃毛 */
   twilight:(z=100)=>(
     <svg width={z} height={z} viewBox="0 0 120 130">
-      {/* 身體 */}
       <ellipse cx="60" cy="102" rx="30" ry="22" fill="#9c27b0"/>
-      {/* 三色鬃毛 */}
       <path d="M22,56 Q30,22 60,18 Q90,22 98,58" fill="none" stroke="#1a237e" strokeWidth="10" strokeLinecap="round"/>
       <path d="M24,59 Q32,26 60,22 Q88,26 96,61" fill="none" stroke="#e91e63" strokeWidth="6" strokeLinecap="round"/>
       <path d="M26,62 Q34,30 60,26 Q86,30 94,63" fill="none" stroke="#9c27b0" strokeWidth="4" strokeLinecap="round"/>
-      {/* 獨角 */}
       <polygon points="54,24 60,4 66,24" fill="#ce93d8"/>
       <line x1="60" y1="8" x2="60" y2="22" stroke="#fff" strokeWidth="1.5" opacity="0.5"/>
-      {/* 頭 */}
       <ellipse cx="60" cy="66" rx="34" ry="30" fill="#9c27b0"/>
-      {/* 眼睛 */}
       <ellipse cx="43" cy="62" rx="9.5" ry="11.5" fill="white"/>
       <ellipse cx="77" cy="62" rx="9.5" ry="11.5" fill="white"/>
       <ellipse cx="43" cy="63" rx="6.5" ry="8.5" fill="#6a1b9a"/>
       <ellipse cx="77" cy="63" rx="6.5" ry="8.5" fill="#6a1b9a"/>
       <circle cx="44.5" cy="60" r="2.8" fill="white"/>
       <circle cx="78.5" cy="60" r="2.8" fill="white"/>
-      {/* 鼻子+嘴 */}
       <ellipse cx="60" cy="75" rx="4.5" ry="3" fill="#7b1fa2"/>
       <path d="M52,80 Q60,88 68,80" fill="none" stroke="#7b1fa2" strokeWidth="2.2" strokeLinecap="round"/>
-      {/* 腮紅 */}
       <ellipse cx="37" cy="73" rx="8.5" ry="5.5" fill="#e1bee7" opacity="0.7"/>
       <ellipse cx="83" cy="73" rx="8.5" ry="5.5" fill="#e1bee7" opacity="0.7"/>
-      {/* 六芒星 */}
       <polygon points="60,98 62.5,104 68,104 63.5,107.5 65.5,113.5 60,110 54.5,113.5 56.5,107.5 52,104 57.5,104" fill="#ffeb3b" transform="scale(0.75) translate(20,30)"/>
     </svg>
   ),
-
-  /* 勝利星 */
   star:(z=100)=>(
     <svg width={z} height={z} viewBox="0 0 120 120">
       <circle cx="60" cy="60" r="50" fill="#ffd93d"/>
@@ -456,7 +403,7 @@ async function genStory(wordPool){
   const wl=ws.map(w=>`${w.en}(${w.zh})`).join('、');
   const prompt=`你是一位國小英語老師。請用以下英文單字，創作一篇有趣的英文小故事，適合國小學生程度。\n\n單字清單：${wl}\n\n要求：\n1. 故事要有完整情節\n2. 英文5~6句，語言自然流暢\n3. 主角請使用角色（如 Kuromi 酷洛米、My Melody 美樂蒂、Cinnamoroll 大耳狗、Pompompurin 布丁狗）\n4. 每個指定單字自然融入故事\n5. 提供完整中文翻譯和3個朗讀重點提示\n\n只回傳 JSON，不要 markdown：\n{"title":"故事標題","en":"英文故事","zh":"中文翻譯","tips":["提示1","提示2","提示3"],"words_used":["單字1","單字2"]}`;
   try{
-    const res=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:900,messages:[{role:"user",content:prompt}]})});
+    const res=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-6",max_tokens:900,messages:[{role:"user",content:prompt}]})});
     const data=await res.json();
     const txt=data.content?.map(i=>i.text||'').join('')||'{}';
     return JSON.parse(txt.replace(/```json|```/g,'').trim());
@@ -590,16 +537,14 @@ const MODES=['listening','dictation','speaking','dictation-en','sentence'];
 
 /* ══════════ APP ══════════ */
 function App(){
-  /* 帳號狀態 */
   const[pg,setPg]=useState('login');
   const[loginUser,setLoginUser]=useState('');
   const[loginPass,setLoginPass]=useState('');
   const[loginErr,setLoginErr]=useState('');
   const[loginLoading,setLoginLoading]=useState(false);
-  const[currentUser,setCurrentUser]=useState(null); // {username, startDate}
+  const[currentUser,setCurrentUser]=useState(null);
   const[isRegister,setIsRegister]=useState(false);
 
-  /* 遊戲狀態 */
   const[sDate,setSDate]=useState('');
   const[vocab,setVocab]=useState([]);
   const[recs,setRecs]=useState({});
@@ -631,49 +576,67 @@ function App(){
   const[fpSq,setFpSq]=useState(0);
   const[sqInitN,setSqInitN]=useState(0);
   const[qChar,setQChar]=useState('kuromi');
-  /* 日曆顯示 */
-  const[calView,setCalView]=useState('all'); // 'all' or 'month'
 
   const recRef=useRef(null);const tmRef=useRef(null);const heardRef=useRef('');
 
   const nextChar=useCallback(()=>{const list=CHAR_LIST.filter(c=>c!==qChar);setQChar(list[Math.floor(Math.random()*list.length)]);},[qChar]);
 
-  /* ── 登入/註冊 ── */
+  /* ══════════ 登入/註冊（修正版）══════════
+     重要修正：
+     1. 帳號 key 統一用小寫（避免大小寫造成找不到）
+     2. 登入時若第一次讀取為 null，等待 300ms 再讀一次
+     3. 註冊時若寫入失敗，明確告知使用者
+  ══════════ */
   const handleAuth=async()=>{
     if(!loginUser.trim()||!loginPass.trim()){setLoginErr('請填寫帳號和密碼');return;}
     setLoginLoading(true);setLoginErr('');
-    const uKey=`user:${loginUser.trim()}`;
+    const uname=loginUser.trim().toLowerCase(); // 統一小寫，避免大小寫問題
+    const uKey=`user:${uname}`;
     if(isRegister){
-      const exists=await ST.get(uKey);
+      // 確認帳號是否已存在（讀兩次，防止偶發讀取失敗誤判）
+      let exists=await ST.get(uKey);
+      if(!exists){
+        await new Promise(res=>setTimeout(res,200));
+        exists=await ST.get(uKey);
+      }
       if(exists){setLoginErr('帳號已存在，請直接登入');setLoginLoading(false);return;}
       const today=fd(new Date());
       const userData={username:loginUser.trim(),passwordHash:btoa(loginPass),startDate:today,createdAt:today};
-      await ST.set(uKey,userData);
-      await ST.set(`recs:${loginUser.trim()}`,{});
-      // 初始化隨機詞庫
+      // 寫入帳號資料（ST.set 已有重試+驗證）
+      const ok=await ST.set(uKey,userData);
+      if(!ok){setLoginErr('帳號建立失敗，請重試');setLoginLoading(false);return;}
+      await ST.set(`recs:${uname}`,{});
       const pv=ELEM.split(',').map(p=>{const[en,zh]=p.split(':');return{en,zh};});
-      await ST.set(`vocab:${loginUser.trim()}`,sh(pv));
-      setCurrentUser(userData);await loadUserData(loginUser.trim(),userData);
+      const vocabOk=await ST.set(`vocab:${uname}`,sh(pv));
+      if(!vocabOk){setLoginErr('詞庫初始化失敗，請重試');setLoginLoading(false);return;}
+      setCurrentUser({...userData,uname});
+      await loadUserData(uname,userData);
     } else {
-      const userData=await ST.get(uKey);
+      // 登入：最多嘗試兩次
+      let userData=await ST.get(uKey);
+      if(!userData){
+        await new Promise(res=>setTimeout(res,300));
+        userData=await ST.get(uKey);
+      }
       if(!userData){setLoginErr('帳號不存在，請先註冊');setLoginLoading(false);return;}
       if(userData.passwordHash!==btoa(loginPass)){setLoginErr('密碼錯誤');setLoginLoading(false);return;}
-      setCurrentUser(userData);await loadUserData(loginUser.trim(),userData);
+      setCurrentUser({...userData,uname});
+      await loadUserData(uname,userData);
     }
     setLoginLoading(false);
   };
 
-  const loadUserData=async(username,userData)=>{
+  const loadUserData=async(uname,userData)=>{
     const pv=ELEM.split(',').map(p=>{const[en,zh]=p.split(':');return{en,zh};});
-    let v=await ST.get(`vocab:${username}`);
-    if(!v){v=sh(pv);await ST.set(`vocab:${username}`,v);}
+    let v=await ST.get(`vocab:${uname}`);
+    if(!v){v=sh(pv);await ST.set(`vocab:${uname}`,v);}
     setVocab(v);setSDate(userData.startDate);
-    let r=await ST.get(`recs:${username}`)||{};setRecs(r);
+    let r=await ST.get(`recs:${uname}`)||{};setRecs(r);
     AU.init();setPg('calendar');
   };
 
   const saveRecs=async(newRecs)=>{
-    if(currentUser){await ST.set(`recs:${currentUser.username}`,newRecs);}
+    if(currentUser){await ST.set(`recs:${currentUser.uname||currentUser.username.toLowerCase()}`,newRecs);}
   };
 
   const handleLogout=()=>{setCurrentUser(null);setLoginUser('');setLoginPass('');setPg('login');setRecs({});setVocab([]);};
@@ -817,7 +780,6 @@ function App(){
   if(pg==='login')return(
     <div className="page safe-t safe-b" style={{background:'linear-gradient(160deg,#f3e5f5,#e8f5e9)',alignItems:'center',justifyContent:'center',padding:'20px 16px'}}>
       <div style={{width:'100%',maxWidth:360,textAlign:'center'}}>
-        {/* 角色排排站 */}
         <div style={{display:'flex',justifyContent:'center',gap:6,marginBottom:8}}>
           {['kuromi','melody','cinnamoroll','pompompurin'].map((c,i)=>{const C=Chars[c];return C?<div key={i} style={{animation:`${i%2?'float2':'float'} ${3+i*0.5}s ease-in-out ${i*0.2}s infinite`}}><C z={44}/></div>:null;})}
         </div>
@@ -847,18 +809,15 @@ function App(){
     const today=fd(new Date());
     const sO=new Date(sDate);sO.setHours(0,0,0,0);
     const tO=new Date(today);tO.setHours(0,0,0,0);
-    // 生成從開始到今天+7天的所有日期
     const totalDays=Math.ceil((tO-sO)/86400000)+8;
     const days=Array.from({length:Math.max(totalDays,7)},(_,i)=>{const d=new Date(sO);d.setDate(d.getDate()+i);return fd(d);});
     const chCycle=[Chars.kuromi,Chars.melody,Chars.pochacco,Chars.cinnamoroll,Chars.pompompurin,Chars.rainbow,Chars.pinkie,Chars.twilight];
-    // 統計
     const totalCompleted=days.filter(ds=>{const dO=new Date(ds);dO.setHours(0,0,0,0);if(dO>tO)return false;const rec=recs[ds]||{};return MODES.every(m=>gR(rec,m)!==null);}).length;
     const pastDays=days.filter(ds=>{const dO=new Date(ds);dO.setHours(0,0,0,0);return dO<tO;}).length;
     const missedDays=days.filter(ds=>{const dO=new Date(ds);dO.setHours(0,0,0,0);if(dO>=tO)return false;const rec=recs[ds]||{};return !MODES.every(m=>gR(rec,m)!==null);}).length;
     return(
       <div className="page safe-t safe-b" style={{background:'#fdfbfd'}}>
         <GlobalUI/>
-        {/* 頂部 */}
         <div style={{padding:'10px 14px 6px',background:'linear-gradient(135deg,#e1bee7,#f8bbd0)',flexShrink:0}}>
           <div style={{display:'flex',alignItems:'center',justifyContent:'space-between'}}>
             <h1 style={{fontSize:'1.15rem',fontWeight:900,color:'#2d2b36',margin:0}}>📅 學習日記</h1>
@@ -867,7 +826,6 @@ function App(){
               <button onClick={handleLogout} style={{background:'rgba(45,43,54,0.15)',border:'none',borderRadius:99,padding:'4px 10px',fontSize:'0.68rem',fontWeight:900,color:'#4a1c40',cursor:'pointer'}}>登出</button>
             </div>
           </div>
-          {/* 統計列 */}
           <div style={{display:'flex',gap:8,marginTop:8}}>
             <div style={{flex:1,background:'rgba(255,255,255,0.7)',borderRadius:12,padding:'6px 10px',textAlign:'center'}}>
               <div style={{fontSize:'1.2rem',fontWeight:900,color:'#2e7d32'}}>{totalCompleted}</div>
@@ -911,7 +869,6 @@ function App(){
                     :isPast?<div style={{opacity:missed&&!partDone?0.3:0.6}}><CC z={32}/></div>
                     :<div style={{opacity:0.15}}><CC z={28}/></div>}
                   <div style={{color:labelCol,fontWeight:900,fontSize:'0.55rem',lineHeight:1.2}}>{label}</div>
-                  {/* 進度點 */}
                   {(isPast||isT)&&<div style={{display:'flex',gap:2,marginTop:1}}>
                     {MODES.map((m,mi)=><div key={mi} style={{width:5,height:5,borderRadius:'50%',background:gR(rec,m)?'#4caf50':'rgba(0,0,0,0.15)'}}/>)}
                   </div>}
@@ -969,7 +926,6 @@ function App(){
           <div style={{background:'#c8e6c9',color:'#2e7d32',borderRadius:99,padding:'4px 10px',fontSize:'0.72rem',fontWeight:900}}>{doneCount}/5</div>
         </div>
         <div className="scroll" style={{padding:'6px 12px'}}>
-          {/* 故事入口 */}
           <div style={{background:'linear-gradient(90deg,#e1bee7,#b3e5fc)',borderRadius:16,padding:'11px 14px',marginBottom:10,display:'flex',alignItems:'center',justifyContent:'space-between',boxShadow:'0 4px 12px rgba(225,190,231,0.3)'}}>
             <div><div style={{fontWeight:900,color:'#3a1c4a',fontSize:'0.95rem'}}>📖 AI 魔法故事</div><div style={{color:'#5c2b4a',fontWeight:700,fontSize:'0.72rem'}}>AI 生成英文故事，跟讀評分</div></div>
             <button onClick={()=>setPg('story')} className="btn" style={{padding:'8px 14px',background:'#fff',color:'#8e78a6',fontSize:'0.82rem'}}>進入 →</button>
@@ -987,7 +943,6 @@ function App(){
               );
             })}
           </div>
-          {/* 補充測驗（錯題） */}
           {r.wrongWords?.length>0&&(<div style={{marginTop:8,background:'#fff9c4',borderRadius:16,padding:'11px 14px',display:'flex',alignItems:'center',justifyContent:'space-between',border:'2px dashed #ffd54f'}}>
             <div><div style={{fontWeight:900,color:'#e65100',fontSize:'0.9rem'}}>🔥 錯題複習</div><div style={{color:'#bf360c',fontWeight:700,fontSize:'0.72rem'}}>{r.wrongWords.length} 個錯誤單字等你挑戰</div></div>
             <button onClick={()=>startGame('comprehensive')} className="btn" style={{padding:'8px 12px',background:'#ff8f00',color:'#fff',fontSize:'0.82rem'}}>{r.comprehensiveDone?'再練🔄':'挑戰→'}</button>
@@ -1104,7 +1059,7 @@ function App(){
             </>}
             {q.type==='arrange'&&<>
               <div style={{fontSize:'0.75rem',color:'#8e78a6',fontWeight:700,textAlign:'center',marginBottom:8}}>點擊單字排列成正確句子</div>
-              <div onClick={()=>{}} onDragOver={e=>e.preventDefault()} onDrop={e=>{e.preventDefault();if(window.dragW){setArrW(p=>p.filter(x=>x!==window.dragW));setArrA(p=>[...p,window.dragW]);}}}
+              <div onDragOver={e=>e.preventDefault()} onDrop={e=>{e.preventDefault();if(window.dragW){setArrW(p=>p.filter(x=>x!==window.dragW));setArrA(p=>[...p,window.dragW]);}}}
                 style={{minHeight:46,background:'#ede7f6',borderRadius:12,padding:'7px 10px',marginBottom:8,display:'flex',flexWrap:'wrap',gap:6,border:'2px dashed rgba(142,120,166,0.3)',alignItems:'center'}}>
                 {arrA.length===0&&<span style={{color:'rgba(74,20,140,0.3)',fontSize:'0.72rem',margin:'auto'}}>點擊下方單字放這裡</span>}
                 {arrA.map((w,i)=><span key={i} onClick={()=>{setArrA(p=>p.filter(x=>x!==w));setArrW(p=>[...p,w]);}} style={{background:'#7e57c2',color:'#fff',padding:'6px 12px',borderRadius:10,fontWeight:900,cursor:'pointer',fontSize:'0.88rem'}}>{w}</span>)}
